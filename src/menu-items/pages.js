@@ -33,7 +33,6 @@ const pages = {
       icon: icons.IconTruckDelivery,
       url: '/page/trip',
     },
-
     {
       id: 'fuel',
       title: 'Fuel',
