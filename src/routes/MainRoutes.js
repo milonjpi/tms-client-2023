@@ -13,6 +13,21 @@ const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
 // pages routing
 
 // libraries
+const ActiveVehicle = Loadable(
+  lazy(() => import('views/Libraries/VehicleInfo/ActiveVehicle'))
+);
+const ActiveDriver = Loadable(
+  lazy(() => import('views/Libraries/DriverInfo/ActiveDriver'))
+);
+const InactiveDriver = Loadable(
+  lazy(() => import('views/Libraries/DriverInfo/InactiveDriver'))
+);
+const VehicleBrand = Loadable(
+  lazy(() => import('views/Libraries/VehicleBrand'))
+);
+const VehicleModel = Loadable(
+  lazy(() => import('views/Libraries/VehicleModel'))
+);
 
 // utilities routing
 
@@ -62,7 +77,84 @@ const MainRoutes = {
         },
         {
           path: 'libraries',
-          children: [],
+          children: [
+            {
+              path: 'vehicle',
+              children: [
+                {
+                  path: 'active-vehicle',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin']}
+                      allowedCodes={['active-vehicle']}
+                    >
+                      <ActiveVehicle />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'inactive-vehicle',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin']}
+                      allowedCodes={['inactive-vehicle']}
+                    >
+                      <ActiveVehicle />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'driver',
+              children: [
+                {
+                  path: 'active-driver',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin']}
+                      allowedCodes={['active-driver']}
+                    >
+                      <ActiveDriver />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'inactive-driver',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin']}
+                      allowedCodes={['inactive-driver']}
+                    >
+                      <InactiveDriver />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'vehicle-brand',
+              element: (
+                <AuthenticationRoutes
+                  allowedRoles={['super_admin']}
+                  allowedCodes={['vehicle-brand']}
+                >
+                  <VehicleBrand />
+                </AuthenticationRoutes>
+              ),
+            },
+            {
+              path: 'vehicle-model',
+              element: (
+                <AuthenticationRoutes
+                  allowedRoles={['super_admin']}
+                  allowedCodes={['vehicle-model']}
+                >
+                  <VehicleModel />
+                </AuthenticationRoutes>
+              ),
+            },
+          ],
         },
         {
           path: 'utils',

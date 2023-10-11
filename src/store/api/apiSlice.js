@@ -1,18 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { BASE_URL } from 'api/client';
 
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://192.168.0.244:5000/api/v1',
+    baseUrl: BASE_URL,
   }),
-  tagTypes: [
-    'brand',
-    'department',
-    'designation',
-    'model',
-    'engineCC',
-    'authLog',
-    'guard',
-  ],
+  tagTypes: ['brand', 'model', 'party', 'vehicle', 'driver', 'trip'],
   endpoints: () => ({}),
 });
