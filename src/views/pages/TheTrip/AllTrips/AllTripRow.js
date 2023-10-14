@@ -7,24 +7,25 @@ import { setToast } from 'store/toastSlice';
 import ConfirmDialog from 'ui-component/ConfirmDialog';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
 import { selectAuth } from 'store/authSlice';
-import { useInactiveVehicleMutation } from 'store/features/vehicle/vehicleApi';
-import UpdateVehicle from './UpdateVehicle';
+import { useDeleteTripMutation } from 'store/features/trip/tripApi';
+import moment from 'moment';
+import UpdateTrip from './UpdateTrip';
 
-const VehicleRow = ({ sn, data }) => {
+const AllTripRow = ({ sn, data }) => {
   const auth = useSelector(selectAuth);
-  const driver = data?.driver;
+  const vehicle = data?.vehicle;
 
   const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState(false);
 
-  const [inactiveVehicle] = useInactiveVehicleMutation();
+  const [deleteTrip] = useDeleteTripMutation();
 
   const dispatch = useDispatch();
 
   const handleDelete = async () => {
     setDialog(false);
     try {
-      const res = await inactiveVehicle({
+      const res = await deleteTrip({
         id: data?.id,
         token: auth?.accessToken,
       }).unwrap();
@@ -50,11 +51,14 @@ const VehicleRow = ({ sn, data }) => {
   return (
     <StyledTableRow>
       <StyledTableCell align="center">{sn}</StyledTableCell>
-      <StyledTableCell>{data?.vehicleId}</StyledTableCell>
-      <StyledTableCell>{data?.regNo}</StyledTableCell>
-      <StyledTableCell>{data?.brand + ' ' + data?.model}</StyledTableCell>
-      <StyledTableCell>{data?.vehicleValue}</StyledTableCell>
-      <StyledTableCell>{driver ? driver?.name : 'n/a'}</StyledTableCell>
+      <StyledTableCell>{data?.tripId}</StyledTableCell>
+      <StyledTableCell>{vehicle?.regNo}</StyledTableCell>
+      <StyledTableCell>
+        {moment(data?.startDate).format('DD/MM/YYYY')}
+      </StyledTableCell>
+      <StyledTableCell>{data?.from + ' to ' + data?.to}</StyledTableCell>
+      <StyledTableCell align="right">{data?.distance}</StyledTableCell>
+      <StyledTableCell align="right">{data?.tripValue}</StyledTableCell>
       <StyledTableCell align="center">
         <ButtonGroup>
           <IconButton
@@ -75,10 +79,10 @@ const VehicleRow = ({ sn, data }) => {
         <ConfirmDialog
           open={dialog}
           setOpen={setDialog}
-          content="Inactive Vehicle"
+          content="Delete Trip"
           handleDelete={handleDelete}
         />
-        <UpdateVehicle
+        <UpdateTrip
           open={open}
           preData={data}
           handleClose={() => setOpen(false)}
@@ -88,4 +92,4 @@ const VehicleRow = ({ sn, data }) => {
   );
 };
 
-export default VehicleRow;
+export default AllTripRow;

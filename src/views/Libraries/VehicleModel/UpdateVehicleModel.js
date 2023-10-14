@@ -43,7 +43,7 @@ const UpdateVehicleModel = ({ open, handleClose, preData }) => {
       const res = await updateModel({
         id: preData?.id,
         token: auth?.accessToken,
-        data,
+        data: { label: data?.label },
       }).unwrap();
       if (res.success) {
         handleClose();

@@ -7,14 +7,28 @@ import { Navigate } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
 import AuthenticationRoutes from './AuthenticationRoutes';
 
+
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
 
 // pages routing
+const AllTrips = Loadable(lazy(() => import('views/pages/TheTrip/AllTrips')));
+const TripExpense = Loadable(
+  lazy(() => import('views/pages/TheTrip/TripExpense'))
+);
 
 // libraries
+const ActiveParty = Loadable(
+  lazy(() => import('views/Libraries/TheParty/ActiveParty'))
+);
+const InactiveParty = Loadable(
+  lazy(() => import('views/Libraries/TheParty/InactiveParty'))
+);
 const ActiveVehicle = Loadable(
   lazy(() => import('views/Libraries/VehicleInfo/ActiveVehicle'))
+);
+const InactiveVehicle = Loadable(
+  lazy(() => import('views/Libraries/VehicleInfo/InactiveVehicle'))
 );
 const ActiveDriver = Loadable(
   lazy(() => import('views/Libraries/DriverInfo/ActiveDriver'))
@@ -73,11 +87,66 @@ const MainRoutes = {
         },
         {
           path: 'pages',
-          children: [],
+          children: [
+            {
+              path: 'trip',
+              children: [
+                {
+                  path: 'all-trips',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin']}
+                      allowedCodes={['all-trips']}
+                    >
+                      <AllTrips />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'trip-expense',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin']}
+                      allowedCodes={['trip-expense']}
+                    >
+                      <TripExpense />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
+          ],
         },
         {
           path: 'libraries',
           children: [
+            {
+              path: 'party',
+              children: [
+                {
+                  path: 'active-party',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin']}
+                      allowedCodes={['active-party']}
+                    >
+                      <ActiveParty />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'inactive-party',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin']}
+                      allowedCodes={['inactive-party']}
+                    >
+                      <InactiveParty />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
             {
               path: 'vehicle',
               children: [
@@ -99,7 +168,7 @@ const MainRoutes = {
                       allowedRoles={['super_admin']}
                       allowedCodes={['inactive-vehicle']}
                     >
-                      <ActiveVehicle />
+                      <InactiveVehicle />
                     </AuthenticationRoutes>
                   ),
                 },

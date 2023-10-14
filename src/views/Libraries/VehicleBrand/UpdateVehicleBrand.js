@@ -43,7 +43,7 @@ const UpdateVehicleBrand = ({ open, handleClose, preData }) => {
       const res = await updateBrand({
         id: preData?.id,
         token: auth?.accessToken,
-        data,
+        data: { label: data?.label },
       }).unwrap();
       if (res.success) {
         handleClose();

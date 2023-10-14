@@ -13,63 +13,36 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
-import { useBrandsQuery } from 'store/features/brand/brandApi';
 import { selectAuth } from 'store/authSlice';
-import { useUpdateVehicleMutation } from 'store/features/vehicle/vehicleApi';
-import UncontrolledAutoComplete from 'ui-component/form-components/UncontrolledAutoComplete';
-import { useModelsQuery } from 'store/features/model/modelApi';
-import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
-import { useDriversQuery } from 'store/features/driver/driverApi';
+import { useAddPartyMutation } from 'store/features/party/partyApi';
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: 300, sm: 500, md: 600 },
+  width: { xs: 300, sm: 500 },
   maxHeight: '100vh',
   overflow: 'auto',
   boxShadow: 24,
   p: 2,
 };
 
-const UpdateVehicle = ({ open, handleClose, preData }) => {
+const AddParty = ({ open, handleClose }) => {
   const auth = useSelector(selectAuth);
-  const [driver, setDriver] = useState(preData?.driver || null);
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit } = useForm({ defaultValues: preData });
-
-  // library
-  const { data: brandData } = useBrandsQuery(auth?.accessToken);
-  const allBrands = brandData?.data;
-
-  const { data: modelData } = useModelsQuery(auth?.accessToken);
-  const allModels = modelData?.data;
-
-  const { data: driverData } = useDriversQuery(auth?.accessToken);
-  const allDrivers = driverData?.data;
-  // end library
+  const { register, handleSubmit, reset } = useForm();
 
   const dispatch = useDispatch();
 
-  const [updateVehicle] = useUpdateVehicleMutation();
+  const [addParty] = useAddPartyMutation();
   const onSubmit = async (data) => {
-    const newData = {
-      regNo: data?.regNo,
-      brand: data?.brand,
-      model: data?.model,
-      vehicleValue: data.vehicleValue || 0,
-      driverId: driver?.id,
-    };
     try {
       setLoading(true);
-      const res = await updateVehicle({
-        id: preData?.id,
-        token: auth?.accessToken,
-        data: newData,
-      }).unwrap();
+      const res = await addParty({ token: auth?.accessToken, data }).unwrap();
       if (res.success) {
         handleClose();
+        reset();
         dispatch(
           setToast({
             open: true,
@@ -102,7 +75,7 @@ const UpdateVehicle = ({ open, handleClose, preData }) => {
           }}
         >
           <Typography sx={{ fontSize: 16, color: '#878781' }}>
-            Edit Vehicle
+            Add Party
           </Typography>
           <IconButton
             color="error"
@@ -123,50 +96,27 @@ const UpdateVehicle = ({ open, handleClose, preData }) => {
               <TextField
                 fullWidth
                 required
-                label="Registration No"
+                label="Party Name"
                 size="small"
-                {...register('regNo', { required: true })}
+                {...register('name', { required: true })}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
-              <UncontrolledAutoComplete
-                defaultValue={preData?.brand || null}
-                options={allBrands?.map((el) => el.label)}
-                label="Select Brand"
-                required
-                register={{ ...register('brand', { required: true }) }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <UncontrolledAutoComplete
-                defaultValue={preData?.model || null}
-                options={allModels?.map((el) => el.label)}
-                label="Select Model"
-                required
-                register={{ ...register('model', { required: true }) }}
-              />
-            </Grid>
-            <Grid item xs={12} md={5}>
+            <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Value in TK"
+                required
+                label="Mobile No"
                 size="small"
-                type="number"
-                {...register('vehicleValue', {
-                  valueAsNumber: true,
-                })}
+                {...register('mobile', { required: true })}
               />
             </Grid>
-            <Grid item xs={12} md={7}>
-              <ControlledAutoComplete
-                label="Select Driver"
-                value={driver}
-                options={allDrivers}
-                getOptionLabel={(option) =>
-                  option.driverId + ', ' + option.name
-                }
-                isOptionEqualToValue={(item, value) => item.id === value.id}
-                onChange={(e, newValue) => setDriver(newValue)}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                required
+                label="Address"
+                size="small"
+                {...register('address', { required: true })}
               />
             </Grid>
             <Grid item xs={12}>
@@ -180,7 +130,7 @@ const UpdateVehicle = ({ open, handleClose, preData }) => {
                 variant="contained"
                 type="submit"
               >
-                Update
+                Submit
               </LoadingButton>
             </Grid>
           </Grid>
@@ -190,4 +140,4 @@ const UpdateVehicle = ({ open, handleClose, preData }) => {
   );
 };
 
-export default UpdateVehicle;
+export default AddParty;

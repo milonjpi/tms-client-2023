@@ -37,12 +37,17 @@ const UpdateDriver = ({ open, handleClose, preData }) => {
 
   const [updateDriver] = useUpdateDriverMutation();
   const onSubmit = async (data) => {
+    const newData = {
+      name: data?.name,
+      mobile: data?.mobile,
+      address: data?.address,
+    };
     try {
       setLoading(true);
       const res = await updateDriver({
         id: preData?.id,
         token: auth?.accessToken,
-        data,
+        data: newData,
       }).unwrap();
       if (res.success) {
         handleClose();

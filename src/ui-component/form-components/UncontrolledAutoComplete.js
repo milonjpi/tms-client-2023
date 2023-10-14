@@ -4,14 +4,7 @@ import { forwardRef } from 'react';
 
 const UncontrolledAutoComplete = forwardRef(
   (
-    {
-      defaultValue = null,
-      options = [],
-      label,
-      isOptionEqualToValue,
-      register,
-      required = false,
-    },
+    { defaultValue = null, options = [], label, register, required = false },
     ref
   ) => {
     return (
@@ -20,7 +13,6 @@ const UncontrolledAutoComplete = forwardRef(
         fullWidth
         size="small"
         options={options}
-        isOptionEqualToValue={isOptionEqualToValue}
         renderInput={(params) => (
           <TextField
             {...params}

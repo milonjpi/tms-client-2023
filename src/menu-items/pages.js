@@ -28,10 +28,23 @@ const pages = {
     {
       id: 'trip',
       title: 'The Trip',
-      type: 'item',
+      type: 'collapse',
       color: '#747ba0',
       icon: icons.IconTruckDelivery,
-      url: '/page/trip',
+      children: [
+        {
+          id: 'all-trips',
+          title: 'All Trips',
+          type: 'item',
+          url: '/pages/trip/all-trips',
+        },
+        {
+          id: 'trip-expense',
+          title: 'Trip Expenses',
+          type: 'item',
+          url: '/pages/trip/trip-expense',
+        },
+      ],
     },
     {
       id: 'fuel',
