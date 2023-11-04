@@ -6,9 +6,8 @@ const brandApi = api.injectEndpoints({
   endpoints: (build) => ({
     // get all brands
     brands: build.query({
-      query: (token) => ({
+      query: () => ({
         url: BRAND_URL,
-        headers: { authorization: token },
         method: 'GET',
       }),
       providesTags: ['brand'],
@@ -16,9 +15,8 @@ const brandApi = api.injectEndpoints({
 
     // get single brand
     brand: build.query({
-      query: (params) => ({
-        url: `${BRAND_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (id) => ({
+        url: `${BRAND_URL}/${id}`,
         method: 'GET',
       }),
       providesTags: ['brand'],
@@ -26,31 +24,28 @@ const brandApi = api.injectEndpoints({
 
     // add brand
     addBrand: build.mutation({
-      query: (params) => ({
+      query: (data) => ({
         url: `${BRAND_URL}/create`,
-        headers: { authorization: params?.token },
         method: 'POST',
-        body: params?.data,
+        data: data,
       }),
       invalidatesTags: ['brand'],
     }),
 
     // update brand
     updateBrand: build.mutation({
-      query: (params) => ({
-        url: `${BRAND_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (data) => ({
+        url: `${BRAND_URL}/${data?.id}`,
         method: 'PATCH',
-        body: params?.data,
+        data: data?.body,
       }),
       invalidatesTags: ['brand'],
     }),
 
     // delete brand
     deleteBrand: build.mutation({
-      query: (params) => ({
-        url: `${BRAND_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (id) => ({
+        url: `${BRAND_URL}/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['brand'],

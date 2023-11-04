@@ -7,17 +7,19 @@ import { Divider, List, Typography } from '@mui/material';
 // project imports
 import NavItem from '../NavItem';
 import NavCollapse from '../NavCollapse';
-import { useSelector } from 'react-redux';
-import { selectAuth } from 'store/authSlice';
+import { useGetProfileQuery } from 'store/api/profile/profileApi';
 
 // ==============================|| SIDEBAR MENU LIST GROUP ||============================== //
 
 const NavGroup = ({ item }) => {
   const theme = useTheme();
-  const auth = useSelector(selectAuth);
-  const subMenus = auth?.user?.subMenus?.map((el) => el.label);
+  const { data } = useGetProfileQuery('', {
+    refetchOnMountOrArgChange: true,
+  });
+  const userData = data?.data;
+  const subMenus = userData?.subMenus?.map((el) => el.label);
   const userSubItems = item?.children?.filter((el) =>
-    ['super_admin'].includes(auth?.user?.role)
+    ['super_admin', 'admin'].includes(userData?.role)
       ? true
       : subMenus?.includes(el.id)
   );

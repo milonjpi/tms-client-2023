@@ -9,18 +9,15 @@ import InputBase from '@mui/material/InputBase';
 import InputAdornment from '@mui/material/InputAdornment';
 import LinearProgress from '@mui/material/LinearProgress';
 import SearchIcon from '@mui/icons-material/Search';
-import { useSelector } from 'react-redux';
 import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
 import VehicleBrandRow from './VehicleBrandRow';
 import AddVehicleBrand from './AddVehicleBrand';
-import { useBrandsQuery } from 'store/features/brand/brandApi';
-import { selectAuth } from 'store/authSlice';
+import { useBrandsQuery } from 'store/api/brand/brandApi';
 
 const VehicleBrand = () => {
-  const auth = useSelector(selectAuth);
   const [searchText, setSearchText] = useState('');
 
   const [open, setOpen] = useState(false);
@@ -39,7 +36,9 @@ const VehicleBrand = () => {
   };
   // end pagination
 
-  const { data, isLoading } = useBrandsQuery(auth?.accessToken);
+  const { data, isLoading } = useBrandsQuery('', {
+    refetchOnMountOrArgChange: true,
+  });
   const allBrands = data?.data;
 
   const filterData = allBrands

@@ -30,10 +30,11 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useDispatch } from 'react-redux';
-import client from 'api/client';
-import { setAuth } from 'store/authSlice';
 import { setToast } from 'store/toastSlice';
 import Toast from 'ui-component/toast/Toast';
+import { useLoginMutation } from 'store/api/auth/authApi';
+import { storeUserInfo } from 'services/auth.service';
+import { setRefresh } from 'store/refreshSlice';
 
 const AuthWrapper = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.primary.light,
@@ -56,29 +57,32 @@ const Login = () => {
     event.preventDefault();
   };
 
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, reset } = useForm();
 
   const dispatch = useDispatch();
+  const [login] = useLoginMutation();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setLoading(true);
-    client
-      .post('/auth/signin', data, { withCredentials: true })
-      .then((res) => {
+    try {
+      const res = await login({ ...data }).unwrap();
+      if (res.success) {
+        storeUserInfo({ accessToken: res?.data?.accessToken });
         setLoading(false);
-        dispatch(setAuth(res.data?.data));
-      })
-      .catch((err) => {
-        setLoading(false);
-        dispatch(
-          setToast({
-            open: true,
-            variant: 'error',
-            message: err.response?.data?.message || 'Network Error',
-            errorMessages: err.response?.data?.errorMessages,
-          })
-        );
-      });
+        dispatch(setRefresh());
+        reset();
+      }
+    } catch (err) {
+      setLoading(false);
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: err?.data?.message || 'Something Went Wrong',
+          errorMessages: err?.data?.errorMessages,
+        })
+      );
+    }
   };
 
   return (

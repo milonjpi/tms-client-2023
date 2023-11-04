@@ -9,18 +9,16 @@ import InputBase from '@mui/material/InputBase';
 import InputAdornment from '@mui/material/InputAdornment';
 import LinearProgress from '@mui/material/LinearProgress';
 import SearchIcon from '@mui/icons-material/Search';
-import { useSelector } from 'react-redux';
 import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import { selectAuth } from 'store/authSlice';
-import { useVehiclesQuery } from 'store/features/vehicle/vehicleApi';
 import VehicleRow from './VehicleRow';
 import AddVehicle from './AddVehicle';
+import { useDebounced } from 'hooks';
+import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
 
 const ActiveVehicle = () => {
-  const auth = useSelector(selectAuth);
   const [searchText, setSearchText] = useState('');
 
   const [open, setOpen] = useState(false);
@@ -39,16 +37,32 @@ const ActiveVehicle = () => {
   };
   // end pagination
 
-  const { data, isLoading } = useVehiclesQuery(auth?.accessToken);
-  const allVehicles = data?.data;
+  // filtering and pagination
+  const query = {};
 
-  const filterData = allVehicles
-    ?.filter((item) =>
-      item.vehicleId?.toLowerCase().includes(searchText?.toLowerCase())
-    )
-    .sort((a, b) => a.vehicleId.localeCompare(b.vehicleId));
+  query['limit'] = rowsPerPage;
+  query['page'] = page;
+  query['isActive'] = true;
 
-  let sn = 1;
+  // search term
+  const debouncedSearchTerm = useDebounced({
+    searchQuery: searchText,
+    delay: 600,
+  });
+
+  if (!!debouncedSearchTerm) {
+    query['searchTerm'] = debouncedSearchTerm;
+  }
+
+  const { data, isLoading } = useVehiclesQuery(
+    { ...query },
+    { refetchOnMountOrArgChange: true }
+  );
+
+  const allVehicles = data?.vehicles || [];
+  const meta = data?.meta;
+
+  let sn = page * rowsPerPage + 1;
   return (
     <MainCard
       title="Active Vehicles"
@@ -96,12 +110,10 @@ const ActiveVehicle = () => {
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {filterData?.length ? (
-              filterData
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((item) => (
-                  <VehicleRow key={item.id} sn={sn++} data={item} />
-                ))
+            {allVehicles?.length ? (
+              allVehicles.map((item) => (
+                <VehicleRow key={item.id} sn={sn++} data={item} />
+              ))
             ) : (
               <StyledTableRow>
                 <StyledTableCell colSpan={10} sx={{ border: 0 }} align="center">
@@ -119,7 +131,7 @@ const ActiveVehicle = () => {
       <TablePagination
         rowsPerPageOptions={[10, 20, 40]}
         component="div"
-        count={filterData?.length || 0}
+        count={meta?.total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

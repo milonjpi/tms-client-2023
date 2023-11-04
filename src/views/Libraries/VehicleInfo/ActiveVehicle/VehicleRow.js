@@ -2,16 +2,14 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import IconButton from '@mui/material/IconButton';
 import { IconEdit, IconTrashXFilled } from '@tabler/icons-react';
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setToast } from 'store/toastSlice';
 import ConfirmDialog from 'ui-component/ConfirmDialog';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import { selectAuth } from 'store/authSlice';
-import { useInactiveVehicleMutation } from 'store/features/vehicle/vehicleApi';
 import UpdateVehicle from './UpdateVehicle';
+import { useInactiveVehicleMutation } from 'store/api/vehicle/vehicleApi';
 
 const VehicleRow = ({ sn, data }) => {
-  const auth = useSelector(selectAuth);
   const driver = data?.driver;
 
   const [open, setOpen] = useState(false);
@@ -24,10 +22,7 @@ const VehicleRow = ({ sn, data }) => {
   const handleDelete = async () => {
     setDialog(false);
     try {
-      const res = await inactiveVehicle({
-        id: data?.id,
-        token: auth?.accessToken,
-      }).unwrap();
+      const res = await inactiveVehicle(data?.id).unwrap();
       if (res.success) {
         dispatch(
           setToast({

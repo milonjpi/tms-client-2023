@@ -11,9 +11,8 @@ import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import LockResetIcon from '@mui/icons-material/LockReset';
 import { useDispatch } from 'react-redux';
-import { setRefresh } from 'store/refreshSlice';
 import { setToast } from 'store/toastSlice';
-import useAxiosPrivate from 'hooks/useAxiosPrivate';
+import { useUpdateUserMutation } from 'store/api/user/userApi';
 
 const style = {
   position: 'absolute',
@@ -31,38 +30,38 @@ const ChangePassword = ({ open, handleClose, uId }) => {
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState('');
 
-  const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch();
 
-  const onSubmit = (e) => {
+  const [updateUser] = useUpdateUserMutation();
+
+  const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    axiosPrivate
-      .patch(`/user/${uId}`, { password })
-      .then((res) => {
+    try {
+      const res = await updateUser({ id: uId, body: { password } }).unwrap();
+      if (res.success) {
         handleClose();
         setPassword('');
-        dispatch(setRefresh());
         dispatch(
           setToast({
             open: true,
             variant: 'success',
-            message: res.data?.message,
+            message: 'Password has been changed',
           })
         );
         setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        dispatch(
-          setToast({
-            open: true,
-            variant: 'error',
-            message: err.response?.data?.message || 'Network Error',
-            errorMessages: err.response?.data?.errorMessages,
-          })
-        );
-      });
+      }
+    } catch (err) {
+      setLoading(false);
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: err?.data?.message || 'Something Went Wrong',
+          errorMessages: err?.data?.errorMessages,
+        })
+      );
+    }
   };
   return (
     <Modal open={open} onClose={handleClose}>

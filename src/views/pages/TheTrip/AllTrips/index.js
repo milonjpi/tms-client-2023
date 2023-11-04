@@ -9,18 +9,16 @@ import InputBase from '@mui/material/InputBase';
 import InputAdornment from '@mui/material/InputAdornment';
 import LinearProgress from '@mui/material/LinearProgress';
 import SearchIcon from '@mui/icons-material/Search';
-import { useSelector } from 'react-redux';
 import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import { selectAuth } from 'store/authSlice';
-import { useTripsQuery } from 'store/features/trip/tripApi';
 import NewTrip from './NewTrip';
 import AllTripRow from './AllTripRow';
+import { useTripsQuery } from 'store/api/trip/tripApi';
+import { useDebounced } from 'hooks';
 
 const AllTrips = () => {
-  const auth = useSelector(selectAuth);
   const [searchText, setSearchText] = useState('');
 
   const [open, setOpen] = useState(false);
@@ -39,16 +37,31 @@ const AllTrips = () => {
   };
   // end pagination
 
-  const { data, isLoading } = useTripsQuery({ token: auth?.accessToken });
-  const allTrips = data?.data;
+  // filtering and pagination
+  const query = {};
 
-  const filterData = allTrips
-    ?.filter((item) =>
-      item.tripId?.toLowerCase().includes(searchText?.toLowerCase())
-    )
-    .sort((a, b) => a.tripId.localeCompare(b.tripId));
+  query['limit'] = rowsPerPage;
+  query['page'] = page;
 
-  let sn = 1;
+  // search term
+  const debouncedSearchTerm = useDebounced({
+    searchQuery: searchText,
+    delay: 600,
+  });
+
+  if (!!debouncedSearchTerm) {
+    query['searchTerm'] = debouncedSearchTerm;
+  }
+
+  const { data, isLoading } = useTripsQuery(
+    { ...query },
+    { refetchOnMountOrArgChange: true }
+  );
+
+  const allTrips = data?.trips || [];
+  const meta = data?.meta;
+
+  let sn = page * rowsPerPage + 1;
   return (
     <MainCard
       title="All Trips"
@@ -97,12 +110,10 @@ const AllTrips = () => {
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {filterData?.length ? (
-              filterData
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((item) => (
-                  <AllTripRow key={item.id} sn={sn++} data={item} />
-                ))
+            {allTrips?.length ? (
+              allTrips.map((item) => (
+                <AllTripRow key={item.id} sn={sn++} data={item} />
+              ))
             ) : (
               <StyledTableRow>
                 <StyledTableCell colSpan={10} sx={{ border: 0 }} align="center">
@@ -120,7 +131,7 @@ const AllTrips = () => {
       <TablePagination
         rowsPerPageOptions={[10, 20, 40]}
         component="div"
-        count={filterData?.length || 0}
+        count={meta?.total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

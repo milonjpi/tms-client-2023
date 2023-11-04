@@ -10,11 +10,10 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
-import { selectAuth } from 'store/authSlice';
-import { useAddDriverMutation } from 'store/features/driver/driverApi';
+import { useAddDriverMutation } from 'store/api/driver/driverApi';
 
 const style = {
   position: 'absolute',
@@ -29,7 +28,6 @@ const style = {
 };
 
 const AddDriver = ({ open, handleClose }) => {
-  const auth = useSelector(selectAuth);
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm();
 
@@ -39,9 +37,10 @@ const AddDriver = ({ open, handleClose }) => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      const res = await addDriver({ token: auth?.accessToken, data }).unwrap();
+      const res = await addDriver({ ...data }).unwrap();
       if (res.success) {
         handleClose();
+        setLoading(false);
         reset();
         dispatch(
           setToast({
@@ -50,7 +49,6 @@ const AddDriver = ({ open, handleClose }) => {
             message: res?.message,
           })
         );
-        setLoading(false);
       }
     } catch (err) {
       setLoading(false);

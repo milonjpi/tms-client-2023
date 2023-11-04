@@ -4,16 +4,20 @@ import { Typography } from '@mui/material';
 // project imports
 import NavGroup from './NavGroup';
 import menuItem from 'menu-items';
-import { useSelector } from 'react-redux';
-import { selectAuth } from 'store/authSlice';
+import { useGetProfileQuery } from 'store/api/profile/profileApi';
 
 // ==============================|| SIDEBAR MENU LIST ||============================== //
 
 const MenuList = () => {
-  const auth = useSelector(selectAuth);
-  const menus = auth?.user?.menus?.map((el) => el.label);
+  const { data } = useGetProfileQuery('', {
+    refetchOnMountOrArgChange: true,
+  });
+  const userData = data?.data;
+  const menus = userData?.menus?.map((el) => el.label);
   const userMenuItems = menuItem.items.filter((el) =>
-    ['super_admin'].includes(auth?.user?.role) ? true : menus?.includes(el.id)
+    ['super_admin', 'admin'].includes(userData?.role)
+      ? true
+      : menus?.includes(el.id)
   );
   const navItems = userMenuItems.map((item) => {
     switch (item.type) {

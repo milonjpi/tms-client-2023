@@ -5,11 +5,13 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
-import useAxiosPrivate from 'hooks/useAxiosPrivate';
 import { useDispatch } from 'react-redux';
-import { setRefresh } from 'store/refreshSlice';
 import { setToast } from 'store/toastSlice';
 import PerSectionRow from './PerSectionRow';
+import {
+  useAddSubMenuMutation,
+  useRemoveSubMenuMutation,
+} from 'store/api/subMenu/subMenuSlice';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -30,51 +32,33 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const PerSubMenuRow = ({ sn, data, userId, subMenu, userSections }) => {
+const PerSubMenuRow = ({ data, userId, subMenu, userSections }) => {
   const { title, children } = data;
 
-  const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch();
+  const [addSubMenu] = useAddSubMenuMutation();
+  const [removeSubMenu] = useRemoveSubMenuMutation();
 
-  const handleSubMenuPermission = (e) => {
+  const handleSubMenuPermission = async (e) => {
     const checkValue = e.target.checked;
-
-    if (checkValue) {
-      const newData = {
-        userId,
-        label: data?.id,
-      };
-      axiosPrivate
-        .post('/subMenu-permission/add', newData)
-        .then((res) => {
-          dispatch(setRefresh());
+    try {
+      if (checkValue) {
+        const newData = {
+          userId,
+          label: data?.id,
+        };
+        await addSubMenu({ ...newData }).unwrap();
+      } else {
+        await removeSubMenu(subMenu?.id).unwrap();
+      }
+    } catch (err) {
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: 'Something Went Wrong',
         })
-        .catch((err) => {
-          dispatch(setRefresh());
-          dispatch(
-            setToast({
-              open: true,
-              variant: 'error',
-              message: 'Something Went Wrong',
-            })
-          );
-        });
-    } else {
-      axiosPrivate
-        .delete(`/subMenu-permission/${subMenu?.id}`)
-        .then((res) => {
-          dispatch(setRefresh());
-        })
-        .catch((err) => {
-          dispatch(setRefresh());
-          dispatch(
-            setToast({
-              open: true,
-              variant: 'error',
-              message: 'Something Went Wrong',
-            })
-          );
-        });
+      );
     }
   };
   return (

@@ -9,18 +9,15 @@ import InputBase from '@mui/material/InputBase';
 import InputAdornment from '@mui/material/InputAdornment';
 import LinearProgress from '@mui/material/LinearProgress';
 import SearchIcon from '@mui/icons-material/Search';
-import { useSelector } from 'react-redux';
 import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import { selectAuth } from 'store/authSlice';
-import { useModelsQuery } from 'store/features/model/modelApi';
 import AddVehicleModel from './AddVehicleModel';
 import VehicleModelRow from './VehicleModelRow';
+import { useModelsQuery } from 'store/api/model/modelApi';
 
 const VehicleModel = () => {
-  const auth = useSelector(selectAuth);
   const [searchText, setSearchText] = useState('');
 
   const [open, setOpen] = useState(false);
@@ -39,7 +36,9 @@ const VehicleModel = () => {
   };
   // end pagination
 
-  const { data, isLoading } = useModelsQuery(auth?.accessToken);
+  const { data, isLoading } = useModelsQuery('', {
+    refetchOnMountOrArgChange: true,
+  });
   const allModels = data?.data;
 
   const filterData = allModels

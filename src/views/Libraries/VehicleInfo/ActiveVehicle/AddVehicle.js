@@ -10,16 +10,15 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
-import { useBrandsQuery } from 'store/features/brand/brandApi';
-import { selectAuth } from 'store/authSlice';
-import { useAddVehicleMutation } from 'store/features/vehicle/vehicleApi';
 import UncontrolledAutoComplete from 'ui-component/form-components/UncontrolledAutoComplete';
-import { useModelsQuery } from 'store/features/model/modelApi';
 import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
-import { useDriversQuery } from 'store/features/driver/driverApi';
+import { useBrandsQuery } from 'store/api/brand/brandApi';
+import { useModelsQuery } from 'store/api/model/modelApi';
+import { useDriversQuery } from 'store/api/driver/driverApi';
+import { useAddVehicleMutation } from 'store/api/vehicle/vehicleApi';
 
 const style = {
   position: 'absolute',
@@ -34,20 +33,26 @@ const style = {
 };
 
 const AddVehicle = ({ open, handleClose }) => {
-  const auth = useSelector(selectAuth);
   const [driver, setDriver] = useState(null);
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm();
 
   // library
-  const { data: brandData } = useBrandsQuery(auth?.accessToken);
+  const { data: brandData } = useBrandsQuery('', {
+    refetchOnMountOrArgChange: true,
+  });
   const allBrands = brandData?.data;
 
-  const { data: modelData } = useModelsQuery(auth?.accessToken);
+  const { data: modelData } = useModelsQuery('', {
+    refetchOnMountOrArgChange: true,
+  });
   const allModels = modelData?.data;
 
-  const { data: driverData } = useDriversQuery(auth?.accessToken);
-  const allDrivers = driverData?.data;
+  const { data: driverData } = useDriversQuery(
+    { limit: 100, isActive: true },
+    { refetchOnMountOrArgChange: true }
+  );
+  const allDrivers = driverData?.drivers || [];
   // end library
 
   const dispatch = useDispatch();
@@ -61,12 +66,10 @@ const AddVehicle = ({ open, handleClose }) => {
     };
     try {
       setLoading(true);
-      const res = await addVehicle({
-        token: auth?.accessToken,
-        data: newData,
-      }).unwrap();
+      const res = await addVehicle({ ...newData }).unwrap();
       if (res.success) {
         handleClose();
+        setLoading(false);
         reset();
         dispatch(
           setToast({
@@ -75,7 +78,6 @@ const AddVehicle = ({ open, handleClose }) => {
             message: res?.message,
           })
         );
-        setLoading(false);
       }
     } catch (err) {
       setLoading(false);

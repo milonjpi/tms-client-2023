@@ -8,18 +8,22 @@ const tripApi = api.injectEndpoints({
     trips: build.query({
       query: (params) => ({
         url: TRIP_URL,
-        headers: { authorization: params?.token },
         method: 'GET',
-        params: params?.arg,
+        params: params,
       }),
+      transformResponse: (response) => {
+        return {
+          trips: response?.data,
+          meta: response?.meta,
+        };
+      },
       providesTags: ['trip'],
     }),
 
     // get single trip
     trip: build.query({
-      query: (params) => ({
-        url: `${TRIP_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (id) => ({
+        url: `${TRIP_URL}/${id}`,
         method: 'GET',
       }),
       providesTags: ['trip'],
@@ -27,31 +31,28 @@ const tripApi = api.injectEndpoints({
 
     // add trip
     addTrip: build.mutation({
-      query: (params) => ({
+      query: (data) => ({
         url: `${TRIP_URL}/create`,
-        headers: { authorization: params?.token },
         method: 'POST',
-        body: params?.data,
+        body: data,
       }),
       invalidatesTags: ['trip'],
     }),
 
     // update trip
     updateTrip: build.mutation({
-      query: (params) => ({
-        url: `${TRIP_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (data) => ({
+        url: `${TRIP_URL}/${data?.id}`,
         method: 'PATCH',
-        body: params?.data,
+        data: data,
       }),
       invalidatesTags: ['trip'],
     }),
 
     // update trip
     deleteTrip: build.mutation({
-      query: (params) => ({
-        url: `${TRIP_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (id) => ({
+        url: `${TRIP_URL}/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['trip'],

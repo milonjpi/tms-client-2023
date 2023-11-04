@@ -1,18 +1,16 @@
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
 import { IconEdit, IconTrashXFilled } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { setRefresh } from 'store/refreshSlice';
 import { setToast } from 'store/toastSlice';
 import ConfirmDialog from 'ui-component/ConfirmDialog';
 import UpdateUser from './UpdateUser';
-import useAxiosPrivate from 'hooks/useAxiosPrivate';
 import { roleValue } from 'assets/data';
+import { useDeleteUserMutation } from 'store/api/user/userApi';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.body}`]: {
@@ -33,31 +31,31 @@ const ManageUserRow = ({ sn, data }) => {
   const [dialog, setDialog] = useState(false);
 
   const dispatch = useDispatch();
-  const axiosPrivate = useAxiosPrivate();
-  const handleDelete = () => {
+
+  const [deleteUser] = useDeleteUserMutation();
+  const handleDelete = async () => {
     setDialog(false);
-    axiosPrivate
-      .delete(`/user/${data?.id}`)
-      .then((res) => {
-        dispatch(setRefresh());
+    try {
+      const res = await deleteUser(data?.id).unwrap();
+      if (res.success) {
         dispatch(
           setToast({
             open: true,
             variant: 'success',
-            message: res.data?.message,
+            message: res?.message,
           })
         );
-      })
-      .catch((err) => {
-        dispatch(
-          setToast({
-            open: true,
-            variant: 'error',
-            message: err.response?.data?.message || 'Network Error',
-            errorMessages: err.response?.data?.errorMessages,
-          })
-        );
-      });
+      }
+    } catch (err) {
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: err?.data?.message || 'Something Went Wrong',
+          errorMessages: err?.data?.errorMessages,
+        })
+      );
+    }
   };
   return (
     <StyledTableRow>
@@ -68,22 +66,26 @@ const ManageUserRow = ({ sn, data }) => {
       <StyledTableCell>{data?.userName}</StyledTableCell>
       <StyledTableCell>{roleValue[data?.role] || ''}</StyledTableCell>
       <StyledTableCell align="center">
-        <ButtonGroup>
-          <IconButton
-            color="primary"
-            size="small"
-            onClick={() => setOpen(true)}
-          >
-            <IconEdit color="#468B97" size={18} />
-          </IconButton>
-          <IconButton
-            size="small"
-            color="error"
-            onClick={() => setDialog(true)}
-          >
-            <IconTrashXFilled size={18} />
-          </IconButton>
-        </ButtonGroup>
+        <Button
+          color="primary"
+          variant="contained"
+          size="small"
+          sx={{ minWidth: 0, mr: 1 }}
+          onClick={() => setOpen(true)}
+        >
+          <IconEdit size={16} />
+        </Button>
+
+        <Button
+          color="error"
+          variant="contained"
+          size="small"
+          sx={{ minWidth: 0 }}
+          onClick={() => setDialog(true)}
+        >
+          <IconTrashXFilled size={16} />
+        </Button>
+
         <ConfirmDialog
           open={dialog}
           setOpen={setDialog}

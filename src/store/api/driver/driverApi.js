@@ -6,19 +6,24 @@ const driverApi = api.injectEndpoints({
   endpoints: (build) => ({
     // get all drivers
     drivers: build.query({
-      query: (token) => ({
+      query: (params) => ({
         url: DRIVER_URL,
-        headers: { authorization: token },
         method: 'GET',
+        params: params,
       }),
+      transformResponse: (response) => {
+        return {
+          drivers: response?.data,
+          meta: response?.meta,
+        };
+      },
       providesTags: ['driver'],
     }),
 
     // get single driver
     driver: build.query({
-      query: (params) => ({
-        url: `${DRIVER_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (id) => ({
+        url: `${DRIVER_URL}/${id}`,
         method: 'GET',
       }),
       providesTags: ['driver'],
@@ -26,31 +31,28 @@ const driverApi = api.injectEndpoints({
 
     // add driver
     addDriver: build.mutation({
-      query: (params) => ({
+      query: (data) => ({
         url: `${DRIVER_URL}/create`,
-        headers: { authorization: params?.token },
         method: 'POST',
-        body: params?.data,
+        data: data,
       }),
       invalidatesTags: ['driver'],
     }),
 
     // update driver
     updateDriver: build.mutation({
-      query: (params) => ({
-        url: `${DRIVER_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (data) => ({
+        url: `${DRIVER_URL}/${data?.id}`,
         method: 'PATCH',
-        body: params?.data,
+        data: data?.body,
       }),
       invalidatesTags: ['driver'],
     }),
 
     // inactive driver
     inactiveDriver: build.mutation({
-      query: (params) => ({
-        url: `${DRIVER_URL}/${params?.id}/inactive`,
-        headers: { authorization: params?.token },
+      query: (id) => ({
+        url: `${DRIVER_URL}/${id}/inactive`,
         method: 'PATCH',
       }),
       invalidatesTags: ['driver'],

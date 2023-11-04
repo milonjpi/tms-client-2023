@@ -13,16 +13,15 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
-import { selectAuth } from 'store/authSlice';
-import { useVehiclesQuery } from 'store/features/vehicle/vehicleApi';
 import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
-import { useDriversQuery } from 'store/features/driver/driverApi';
-import { useAddTripMutation } from 'store/features/trip/tripApi';
 import moment from 'moment';
-import { usePartiesQuery } from 'store/features/party/partyApi';
+import { useDriversQuery } from 'store/api/driver/driverApi';
+import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
+import { usePartiesQuery } from 'store/api/party/partyApi';
+import { useAddTripMutation } from 'store/api/trip/tripApi';
 
 const style = {
   position: 'absolute',
@@ -37,7 +36,6 @@ const style = {
 };
 
 const NewTrip = ({ open, handleClose }) => {
-  const auth = useSelector(selectAuth);
   const [startDate, setStartDate] = useState(moment());
   const [endDate, setEndDate] = useState(moment());
   const [vehicle, setVehicle] = useState(null);
@@ -47,19 +45,29 @@ const NewTrip = ({ open, handleClose }) => {
   const { register, handleSubmit, reset } = useForm();
 
   // library
-  const { data: vehicleData } = useVehiclesQuery(auth?.accessToken);
-  const allVehicles = vehicleData?.data;
+  const { data: vehicleData } = useVehiclesQuery(
+    { limit: 100, isActive: true },
+    { refetchOnMountOrArgChange: true }
+  );
+  const allVehicles = vehicleData?.vehicles || [];
 
-  const { data: driverData } = useDriversQuery(auth?.accessToken);
-  const allDrivers = driverData?.data;
+  const { data: driverData } = useDriversQuery(
+    { limit: 100, isActive: true },
+    { refetchOnMountOrArgChange: true }
+  );
+  const allDrivers = driverData?.drivers || [];
 
-  const { data: partyData } = usePartiesQuery(auth?.accessToken);
-  const allParties = partyData?.data;
+  const { data: partyData } = usePartiesQuery(
+    { limit: 100, isActive: true },
+    { refetchOnMountOrArgChange: true }
+  );
+  const allParties = partyData?.parties || [];
   // end library
 
   const dispatch = useDispatch();
 
   const [addTrip] = useAddTripMutation();
+
   const onSubmit = async (data) => {
     const newData = {
       ...data,
@@ -73,12 +81,10 @@ const NewTrip = ({ open, handleClose }) => {
 
     try {
       setLoading(true);
-      const res = await addTrip({
-        token: auth?.accessToken,
-        data: newData,
-      }).unwrap();
+      const res = await addTrip({ ...newData }).unwrap();
       if (res.success) {
         handleClose();
+        setLoading(false);
         reset();
         dispatch(
           setToast({
@@ -87,7 +93,6 @@ const NewTrip = ({ open, handleClose }) => {
             message: res?.message,
           })
         );
-        setLoading(false);
       }
     } catch (err) {
       setLoading(false);

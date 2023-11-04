@@ -9,15 +9,13 @@ import InputBase from '@mui/material/InputBase';
 import InputAdornment from '@mui/material/InputAdornment';
 import LinearProgress from '@mui/material/LinearProgress';
 import SearchIcon from '@mui/icons-material/Search';
-import { useSelector } from 'react-redux';
 import MainCard from 'ui-component/cards/MainCard';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import { selectAuth } from 'store/authSlice';
-import { usePartiesQuery } from 'store/features/party/partyApi';
 import InactivePartyRow from './InactivePartyRow';
+import { useDebounced } from 'hooks';
+import { usePartiesQuery } from 'store/api/party/partyApi';
 
 const InactiveParty = () => {
-  const auth = useSelector(selectAuth);
   const [searchText, setSearchText] = useState('');
 
   // pagination
@@ -34,16 +32,32 @@ const InactiveParty = () => {
   };
   // end pagination
 
-  const { data, isLoading } = usePartiesQuery(auth?.accessToken);
-  const allParties = data?.data;
+  // filtering and pagination
+  const query = {};
 
-  const filterData = allParties
-    ?.filter((item) =>
-      item.partyId?.toLowerCase().includes(searchText?.toLowerCase())
-    )
-    .sort((a, b) => a.partyId.localeCompare(b.partyId));
+  query['limit'] = rowsPerPage;
+  query['page'] = page;
+  query['isActive'] = false;
 
-  let sn = 1;
+  // search term
+  const debouncedSearchTerm = useDebounced({
+    searchQuery: searchText,
+    delay: 600,
+  });
+
+  if (!!debouncedSearchTerm) {
+    query['searchTerm'] = debouncedSearchTerm;
+  }
+
+  const { data, isLoading } = usePartiesQuery(
+    { ...query },
+    { refetchOnMountOrArgChange: true }
+  );
+
+  const allParties = data?.parties || [];
+  const meta = data?.meta;
+
+  let sn = page * rowsPerPage + 1;
   return (
     <MainCard title="Inactive Parties">
       <Box sx={{ mb: 2 }}>
@@ -77,12 +91,10 @@ const InactiveParty = () => {
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {filterData?.length ? (
-              filterData
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((item) => (
-                  <InactivePartyRow key={item.id} sn={sn++} data={item} />
-                ))
+            {allParties?.length ? (
+              allParties.map((item) => (
+                <InactivePartyRow key={item.id} sn={sn++} data={item} />
+              ))
             ) : (
               <StyledTableRow>
                 <StyledTableCell colSpan={10} sx={{ border: 0 }} align="center">
@@ -100,7 +112,7 @@ const InactiveParty = () => {
       <TablePagination
         rowsPerPageOptions={[10, 20, 40]}
         component="div"
-        count={filterData?.length || 0}
+        count={meta?.total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

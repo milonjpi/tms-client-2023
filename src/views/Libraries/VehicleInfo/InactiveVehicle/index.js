@@ -9,15 +9,13 @@ import InputBase from '@mui/material/InputBase';
 import InputAdornment from '@mui/material/InputAdornment';
 import LinearProgress from '@mui/material/LinearProgress';
 import SearchIcon from '@mui/icons-material/Search';
-import { useSelector } from 'react-redux';
 import MainCard from 'ui-component/cards/MainCard';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import { selectAuth } from 'store/authSlice';
-import { useVehiclesQuery } from 'store/features/vehicle/vehicleApi';
 import InactiveVehicleRow from './InactiveVehicleRow';
+import { useDebounced } from 'hooks';
+import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
 
 const InactiveVehicle = () => {
-  const auth = useSelector(selectAuth);
   const [searchText, setSearchText] = useState('');
 
   // pagination
@@ -34,16 +32,32 @@ const InactiveVehicle = () => {
   };
   // end pagination
 
-  const { data, isLoading } = useVehiclesQuery(auth?.accessToken);
-  const allVehicles = data?.data;
+  // filtering and pagination
+  const query = {};
 
-  const filterData = allVehicles
-    ?.filter((item) =>
-      item.vehicleId?.toLowerCase().includes(searchText?.toLowerCase())
-    )
-    .sort((a, b) => a.vehicleId.localeCompare(b.vehicleId));
+  query['limit'] = rowsPerPage;
+  query['page'] = page;
+  query['isActive'] = false;
 
-  let sn = 1;
+  // search term
+  const debouncedSearchTerm = useDebounced({
+    searchQuery: searchText,
+    delay: 600,
+  });
+
+  if (!!debouncedSearchTerm) {
+    query['searchTerm'] = debouncedSearchTerm;
+  }
+
+  const { data, isLoading } = useVehiclesQuery(
+    { ...query },
+    { refetchOnMountOrArgChange: true }
+  );
+
+  const allVehicles = data?.vehicles || [];
+  const meta = data?.meta;
+
+  let sn = page * rowsPerPage + 1;
   return (
     <MainCard title="Inactive Vehicles">
       <Box sx={{ mb: 2 }}>
@@ -78,12 +92,10 @@ const InactiveVehicle = () => {
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {filterData?.length ? (
-              filterData
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((item) => (
-                  <InactiveVehicleRow key={item.id} sn={sn++} data={item} />
-                ))
+            {allVehicles?.length ? (
+              allVehicles.map((item) => (
+                <InactiveVehicleRow key={item.id} sn={sn++} data={item} />
+              ))
             ) : (
               <StyledTableRow>
                 <StyledTableCell colSpan={10} sx={{ border: 0 }} align="center">
@@ -101,7 +113,7 @@ const InactiveVehicle = () => {
       <TablePagination
         rowsPerPageOptions={[10, 20, 40]}
         component="div"
-        count={filterData?.length || 0}
+        count={meta?.total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

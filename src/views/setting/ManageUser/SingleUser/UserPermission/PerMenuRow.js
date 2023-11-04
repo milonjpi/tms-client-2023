@@ -6,10 +6,12 @@ import TableRow from '@mui/material/TableRow';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import PerSubMenuRow from './PerSubMenuRow';
-import useAxiosPrivate from 'hooks/useAxiosPrivate';
 import { useDispatch } from 'react-redux';
-import { setRefresh } from 'store/refreshSlice';
 import { setToast } from 'store/toastSlice';
+import {
+  useAddMenuMutation,
+  useRemoveMenuMutation,
+} from 'store/api/menu/menuApi';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -40,48 +42,33 @@ const PerMenuRow = ({
 }) => {
   const { title, children } = data;
 
-  const axiosPrivate = useAxiosPrivate();
+  const allSubMenu = children?.filter((el) => el.id !== 'setting') || [];
+
   const dispatch = useDispatch();
 
-  const handleMenuPermission = (e) => {
-    const checkValue = e.target.checked;
+  const [addMenu] = useAddMenuMutation();
+  const [removeMenu] = useRemoveMenuMutation();
 
-    if (checkValue) {
-      const newData = {
-        userId,
-        label: data?.id,
-      };
-      axiosPrivate
-        .post('/menu-permission/add', newData)
-        .then((res) => {
-          dispatch(setRefresh());
+  const handleMenuPermission = async (e) => {
+    const checkValue = e.target.checked;
+    try {
+      if (checkValue) {
+        const newData = {
+          userId,
+          label: data?.id,
+        };
+        await addMenu({ ...newData }).unwrap();
+      } else {
+        await removeMenu(userMenu?.id).unwrap();
+      }
+    } catch (err) {
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: 'Something Went Wrong',
         })
-        .catch((err) => {
-          dispatch(setRefresh());
-          dispatch(
-            setToast({
-              open: true,
-              variant: 'error',
-              message: 'Something Went Wrong',
-            })
-          );
-        });
-    } else {
-      axiosPrivate
-        .delete(`/menu-permission/${userMenu?.id}`)
-        .then((res) => {
-          dispatch(setRefresh());
-        })
-        .catch((err) => {
-          dispatch(setRefresh());
-          dispatch(
-            setToast({
-              open: true,
-              variant: 'error',
-              message: 'Something Went Wrong',
-            })
-          );
-        });
+      );
     }
   };
   return (
@@ -102,8 +89,8 @@ const PerMenuRow = ({
       <StyledTableCell>
         <Table>
           <TableBody>
-            {children?.length
-              ? children.map((el) => (
+            {allSubMenu?.length
+              ? allSubMenu.map((el) => (
                   <PerSubMenuRow
                     key={el.id}
                     data={el}

@@ -10,11 +10,10 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
-import { selectAuth } from 'store/authSlice';
-import { useUpdatePartyMutation } from 'store/features/party/partyApi';
+import { useUpdatePartyMutation } from 'store/api/party/partyApi';
 
 const style = {
   position: 'absolute',
@@ -29,7 +28,6 @@ const style = {
 };
 
 const UpdateParty = ({ open, handleClose, preData }) => {
-  const auth = useSelector(selectAuth);
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm({ defaultValues: preData });
 
@@ -46,11 +44,11 @@ const UpdateParty = ({ open, handleClose, preData }) => {
       setLoading(true);
       const res = await updateParty({
         id: preData?.id,
-        token: auth?.accessToken,
-        data: newData,
+        body: newData,
       }).unwrap();
       if (res.success) {
         handleClose();
+        setLoading(false);
         dispatch(
           setToast({
             open: true,
@@ -58,7 +56,6 @@ const UpdateParty = ({ open, handleClose, preData }) => {
             message: res?.message,
           })
         );
-        setLoading(false);
       }
     } catch (err) {
       setLoading(false);

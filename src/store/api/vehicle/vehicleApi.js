@@ -6,19 +6,24 @@ const vehicleApi = api.injectEndpoints({
   endpoints: (build) => ({
     // get all vehicles
     vehicles: build.query({
-      query: (token) => ({
+      query: (params) => ({
         url: VEHICLE_URL,
-        headers: { authorization: token },
         method: 'GET',
+        params: params,
       }),
+      transformResponse: (response) => {
+        return {
+          vehicles: response?.data,
+          meta: response?.meta,
+        };
+      },
       providesTags: ['vehicle'],
     }),
 
     // get single vehicle
     vehicle: build.query({
-      query: (params) => ({
-        url: `${VEHICLE_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (id) => ({
+        url: `${VEHICLE_URL}/${id}`,
         method: 'GET',
       }),
       providesTags: ['vehicle'],
@@ -26,31 +31,28 @@ const vehicleApi = api.injectEndpoints({
 
     // add vehicle
     addVehicle: build.mutation({
-      query: (params) => ({
+      query: (data) => ({
         url: `${VEHICLE_URL}/create`,
-        headers: { authorization: params?.token },
         method: 'POST',
-        body: params?.data,
+        data: data,
       }),
       invalidatesTags: ['vehicle'],
     }),
 
     // update vehicle
     updateVehicle: build.mutation({
-      query: (params) => ({
-        url: `${VEHICLE_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (data) => ({
+        url: `${VEHICLE_URL}/${data?.id}`,
         method: 'PATCH',
-        body: params?.data,
+        data: data?.body,
       }),
       invalidatesTags: ['vehicle'],
     }),
 
     // update vehicle
     inactiveVehicle: build.mutation({
-      query: (params) => ({
-        url: `${VEHICLE_URL}/${params?.id}/inactive`,
-        headers: { authorization: params?.token },
+      query: (id) => ({
+        url: `${VEHICLE_URL}/${id}/inactive`,
         method: 'PATCH',
       }),
       invalidatesTags: ['vehicle'],

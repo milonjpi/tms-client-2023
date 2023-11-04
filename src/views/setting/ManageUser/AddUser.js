@@ -12,9 +12,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { setRefresh } from 'store/refreshSlice';
 import { setToast } from 'store/toastSlice';
-import useAxiosPrivate from 'hooks/useAxiosPrivate';
+import { useCreateUserMutation } from 'store/api/user/userApi';
 
 const style = {
   position: 'absolute',
@@ -32,37 +31,38 @@ const AddUser = ({ open, handleClose }) => {
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm();
 
-  const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch();
 
-  const onSubmit = (data) => {
+  const [createUser] = useCreateUserMutation();
+
+  const onSubmit = async (data) => {
     setLoading(true);
-    axiosPrivate
-      .post('/auth/signup', data)
-      .then((res) => {
+    try {
+      const res = await createUser({ ...data }).unwrap();
+
+      if (res.success) {
         handleClose();
         reset();
-        dispatch(setRefresh());
         dispatch(
           setToast({
             open: true,
             variant: 'success',
-            message: res.data?.message,
+            message: res?.message,
           })
         );
         setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        dispatch(
-          setToast({
-            open: true,
-            variant: 'error',
-            message: err.response?.data?.message || 'Network Error',
-            errorMessages: err.response?.data?.errorMessages,
-          })
-        );
-      });
+      }
+    } catch (err) {
+      setLoading(false);
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: err?.data?.message || 'Something Went Wrong',
+          errorMessages: err?.data?.errorMessages,
+        })
+      );
+    }
   };
   return (
     <Modal open={open} onClose={handleClose}>
@@ -85,7 +85,7 @@ const AddUser = ({ open, handleClose }) => {
             <CloseIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Box>
-        <Divider sx={{ mb: 2 }} />
+        <Divider sx={{ mb: 2, mt: 1 }} />
         <Box
           component="form"
           autoComplete="off"

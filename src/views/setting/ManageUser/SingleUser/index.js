@@ -6,11 +6,8 @@ import { styled } from '@mui/material/styles';
 import { useLocation, Link, useParams, Outlet } from 'react-router-dom';
 import LockPersonIcon from '@mui/icons-material/LockPerson';
 import InfoIcon from '@mui/icons-material/Info';
-import { useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
-import { selectRefresh } from 'store/refreshSlice';
 import NotFoundUser from './NotFoundUser';
-import useAxiosPrivate from 'hooks/useAxiosPrivate';
+import { useGetSingleUserQuery } from 'store/api/user/userApi';
 
 const NavItem = styled(ButtonBase)`
   border-radius: 5px 5px 0 0;
@@ -19,27 +16,17 @@ const NavItem = styled(ButtonBase)`
 
 const SingleUser = () => {
   const { id } = useParams();
-  const [data, setData] = useState({});
 
   // location
   let location = useLocation();
   const path = location?.pathname?.split('/')[5] || '';
 
-  const axiosPrivate = useAxiosPrivate();
-  const refresh = useSelector(selectRefresh);
+  const { data, isLoading } = useGetSingleUserQuery(id, {
+    refetchOnMountOrArgChange: true,
+  });
+  const userData = data?.data;
 
-  useEffect(() => {
-    axiosPrivate
-      .get(`/user/${id}`)
-      .then((res) => {
-        setData(res.data?.data);
-      })
-      .catch((err) => {
-        setData(null);
-      });
-  }, [refresh, id, axiosPrivate]);
-
-  if (!data) {
+  if (!userData && !isLoading) {
     return <NotFoundUser />;
   }
 
@@ -55,7 +42,7 @@ const SingleUser = () => {
       >
         <Box>
           <Typography sx={{ fontSize: 18, color: '#fff', lineHeight: 1 }}>
-            {data?.fullName ? data?.fullName : 'Loading...'}
+            {userData?.fullName ? userData?.fullName : 'Loading...'}
           </Typography>
         </Box>
         <Box sx={{ mt: 1.5 }}>
@@ -88,7 +75,7 @@ const SingleUser = () => {
         </Box>
       </Box>
       <Box sx={{ p: 2 }}>
-        <Outlet context={{ data }} />
+        <Outlet context={{ data: userData }} />
       </Box>
     </Paper>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import InputBase from '@mui/material/InputBase';
@@ -13,13 +13,11 @@ import TableRow from '@mui/material/TableRow';
 import LinearProgress from '@mui/material/LinearProgress';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import { useSelector } from 'react-redux';
-import { selectRefresh } from 'store/refreshSlice';
 import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import AddUser from './AddUser';
 import ManageUserRow from './ManageUserRow';
-import useAxiosPrivate from 'hooks/useAxiosPrivate';
+import { useGetUsersQuery } from 'store/api/user/userApi';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -45,10 +43,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const ManageUser = () => {
-  const [data, setData] = useState([]);
   const [searchText, setSearchText] = useState('');
 
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
   // pagination
@@ -65,28 +61,18 @@ const ManageUser = () => {
   };
   // end pagination
 
-  const axiosPrivate = useAxiosPrivate();
+  const { data, isLoading } = useGetUsersQuery('', {
+    refetchOnMountOrArgChange: true,
+  });
 
-  const refresh = useSelector(selectRefresh);
+  const usersData = data?.data || [];
 
-  useEffect(() => {
-    setLoading(true);
-    axiosPrivate
-      .get('/user')
-      .then((res) => {
-        setData(res.data?.data);
-      })
-      .catch((err) => {
-        setLoading(false);
-      });
-  }, [refresh, axiosPrivate]);
-
-  const filterData = data?.filter(
+  const filterData = usersData?.filter(
     (item) =>
       item.userName?.toLowerCase().includes(searchText?.toLowerCase()) ||
       item.fullName?.toLowerCase().includes(searchText?.toLowerCase())
   );
-  let sn = 1;
+  let sn = page * rowsPerPage + 1;
   return (
     <MainCard
       title="Manage Users"
@@ -150,7 +136,7 @@ const ManageUser = () => {
             ) : (
               <StyledTableRow>
                 <StyledTableCell colSpan={10} sx={{ border: 0 }} align="center">
-                  {loading ? (
+                  {isLoading ? (
                     <LinearProgress
                       color="primary"
                       sx={{ opacity: 0.5, py: 0.5 }}

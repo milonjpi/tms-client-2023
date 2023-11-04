@@ -95,7 +95,7 @@ const MainRoutes = {
                   path: 'all-trips',
                   element: (
                     <AuthenticationRoutes
-                      allowedRoles={['super_admin']}
+                      allowedRoles={['super_admin', 'admin']}
                       allowedCodes={['all-trips']}
                     >
                       <AllTrips />
@@ -106,7 +106,7 @@ const MainRoutes = {
                   path: 'trip-expense',
                   element: (
                     <AuthenticationRoutes
-                      allowedRoles={['super_admin']}
+                      allowedRoles={['super_admin', 'admin']}
                       allowedCodes={['trip-expense']}
                     >
                       <TripExpense />
@@ -127,7 +127,7 @@ const MainRoutes = {
                   path: 'active-party',
                   element: (
                     <AuthenticationRoutes
-                      allowedRoles={['super_admin']}
+                      allowedRoles={['super_admin', 'admin']}
                       allowedCodes={['active-party']}
                     >
                       <ActiveParty />
@@ -138,7 +138,7 @@ const MainRoutes = {
                   path: 'inactive-party',
                   element: (
                     <AuthenticationRoutes
-                      allowedRoles={['super_admin']}
+                      allowedRoles={['super_admin', 'admin']}
                       allowedCodes={['inactive-party']}
                     >
                       <InactiveParty />
@@ -154,7 +154,7 @@ const MainRoutes = {
                   path: 'active-vehicle',
                   element: (
                     <AuthenticationRoutes
-                      allowedRoles={['super_admin']}
+                      allowedRoles={['super_admin', 'admin']}
                       allowedCodes={['active-vehicle']}
                     >
                       <ActiveVehicle />
@@ -165,7 +165,7 @@ const MainRoutes = {
                   path: 'inactive-vehicle',
                   element: (
                     <AuthenticationRoutes
-                      allowedRoles={['super_admin']}
+                      allowedRoles={['super_admin', 'admin']}
                       allowedCodes={['inactive-vehicle']}
                     >
                       <InactiveVehicle />
@@ -181,7 +181,7 @@ const MainRoutes = {
                   path: 'active-driver',
                   element: (
                     <AuthenticationRoutes
-                      allowedRoles={['super_admin']}
+                      allowedRoles={['super_admin', 'admin']}
                       allowedCodes={['active-driver']}
                     >
                       <ActiveDriver />
@@ -192,7 +192,7 @@ const MainRoutes = {
                   path: 'inactive-driver',
                   element: (
                     <AuthenticationRoutes
-                      allowedRoles={['super_admin']}
+                      allowedRoles={['super_admin', 'admin']}
                       allowedCodes={['inactive-driver']}
                     >
                       <InactiveDriver />
@@ -205,7 +205,7 @@ const MainRoutes = {
               path: 'vehicle-brand',
               element: (
                 <AuthenticationRoutes
-                  allowedRoles={['super_admin']}
+                  allowedRoles={['super_admin', 'admin']}
                   allowedCodes={['vehicle-brand']}
                 >
                   <VehicleBrand />
@@ -216,7 +216,7 @@ const MainRoutes = {
               path: 'vehicle-model',
               element: (
                 <AuthenticationRoutes
-                  allowedRoles={['super_admin']}
+                  allowedRoles={['super_admin', 'admin']}
                   allowedCodes={['vehicle-model']}
                 >
                   <VehicleModel />
@@ -235,7 +235,7 @@ const MainRoutes = {
                   path: 'manage-user',
                   element: (
                     <AuthenticationRoutes
-                      allowedRoles={['super_admin']}
+                      allowedRoles={['super_admin', 'admin']}
                       allowedCodes={['manage-user']}
                     >
                       <ManageUser />
@@ -246,7 +246,7 @@ const MainRoutes = {
                   path: 'manage-user/:id',
                   element: (
                     <AuthenticationRoutes
-                      allowedRoles={['super_admin']}
+                      allowedRoles={['super_admin', 'admin']}
                       allowedCodes={['manage-user']}
                     >
                       <SingleUser />

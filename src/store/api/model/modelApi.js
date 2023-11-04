@@ -6,9 +6,8 @@ const modelApi = api.injectEndpoints({
   endpoints: (build) => ({
     // get all models
     models: build.query({
-      query: (token) => ({
+      query: () => ({
         url: MODEL_URL,
-        headers: { authorization: token },
         method: 'GET',
       }),
       providesTags: ['model'],
@@ -16,9 +15,8 @@ const modelApi = api.injectEndpoints({
 
     // get single model
     model: build.query({
-      query: (params) => ({
-        url: `${MODEL_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (id) => ({
+        url: `${MODEL_URL}/${id}`,
         method: 'GET',
       }),
       providesTags: ['model'],
@@ -26,31 +24,28 @@ const modelApi = api.injectEndpoints({
 
     // add model
     addModel: build.mutation({
-      query: (params) => ({
+      query: (data) => ({
         url: `${MODEL_URL}/create`,
-        headers: { authorization: params?.token },
         method: 'POST',
-        body: params?.data,
+        data: data,
       }),
       invalidatesTags: ['model'],
     }),
 
     // update model
     updateModel: build.mutation({
-      query: (params) => ({
-        url: `${MODEL_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (data) => ({
+        url: `${MODEL_URL}/${data?.id}`,
         method: 'PATCH',
-        body: params?.data,
+        data: data?.body,
       }),
       invalidatesTags: ['model'],
     }),
 
     // update model
     deleteModel: build.mutation({
-      query: (params) => ({
-        url: `${MODEL_URL}/${params?.id}`,
-        headers: { authorization: params?.token },
+      query: (id) => ({
+        url: `${MODEL_URL}/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['model'],

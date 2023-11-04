@@ -9,18 +9,16 @@ import InputBase from '@mui/material/InputBase';
 import InputAdornment from '@mui/material/InputAdornment';
 import LinearProgress from '@mui/material/LinearProgress';
 import SearchIcon from '@mui/icons-material/Search';
-import { useSelector } from 'react-redux';
 import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import { selectAuth } from 'store/authSlice';
-import { usePartiesQuery } from 'store/features/party/partyApi';
 import ActivePartyRow from './ActivePartyRow';
 import AddParty from './AddParty';
+import { useDebounced } from 'hooks';
+import { usePartiesQuery } from 'store/api/party/partyApi';
 
 const ActiveParty = () => {
-  const auth = useSelector(selectAuth);
   const [searchText, setSearchText] = useState('');
 
   const [open, setOpen] = useState(false);
@@ -39,16 +37,32 @@ const ActiveParty = () => {
   };
   // end pagination
 
-  const { data, isLoading } = usePartiesQuery(auth?.accessToken);
-  const allParties = data?.data;
+  // filtering and pagination
+  const query = {};
 
-  const filterData = allParties
-    ?.filter((item) =>
-      item.partyId?.toLowerCase().includes(searchText?.toLowerCase())
-    )
-    .sort((a, b) => a.partyId.localeCompare(b.partyId));
+  query['limit'] = rowsPerPage;
+  query['page'] = page;
+  query['isActive'] = true;
 
-  let sn = 1;
+  // search term
+  const debouncedSearchTerm = useDebounced({
+    searchQuery: searchText,
+    delay: 600,
+  });
+
+  if (!!debouncedSearchTerm) {
+    query['searchTerm'] = debouncedSearchTerm;
+  }
+
+  const { data, isLoading } = usePartiesQuery(
+    { ...query },
+    { refetchOnMountOrArgChange: true }
+  );
+
+  const allParties = data?.parties || [];
+  const meta = data?.meta;
+
+  let sn = page * rowsPerPage + 1;
   return (
     <MainCard
       title="Active Parties"
@@ -95,12 +109,10 @@ const ActiveParty = () => {
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {filterData?.length ? (
-              filterData
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((item) => (
-                  <ActivePartyRow key={item.id} sn={sn++} data={item} />
-                ))
+            {allParties?.length ? (
+              allParties.map((item) => (
+                <ActivePartyRow key={item.id} sn={sn++} data={item} />
+              ))
             ) : (
               <StyledTableRow>
                 <StyledTableCell colSpan={10} sx={{ border: 0 }} align="center">
@@ -118,7 +130,7 @@ const ActiveParty = () => {
       <TablePagination
         rowsPerPageOptions={[10, 20, 40]}
         component="div"
-        count={filterData?.length || 0}
+        count={meta?.total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

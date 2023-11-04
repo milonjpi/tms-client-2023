@@ -9,15 +9,13 @@ import InputBase from '@mui/material/InputBase';
 import InputAdornment from '@mui/material/InputAdornment';
 import LinearProgress from '@mui/material/LinearProgress';
 import SearchIcon from '@mui/icons-material/Search';
-import { useSelector } from 'react-redux';
 import MainCard from 'ui-component/cards/MainCard';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import { selectAuth } from 'store/authSlice';
-import { useDriversQuery } from 'store/features/driver/driverApi';
 import InactiveDriverRow from './InactiveDriverRow';
+import { useDebounced } from 'hooks';
+import { useDriversQuery } from 'store/api/driver/driverApi';
 
 const InactiveDriver = () => {
-  const auth = useSelector(selectAuth);
   const [searchText, setSearchText] = useState('');
 
   // pagination
@@ -34,16 +32,32 @@ const InactiveDriver = () => {
   };
   // end pagination
 
-  const { data, isLoading } = useDriversQuery(auth?.accessToken);
-  const allDrivers = data?.data;
+  // filtering and pagination
+  const query = {};
 
-  const filterData = allDrivers
-    ?.filter((item) =>
-      item.driverId?.toLowerCase().includes(searchText?.toLowerCase())
-    )
-    .sort((a, b) => a.driverId.localeCompare(b.driverId));
+  query['limit'] = rowsPerPage;
+  query['page'] = page;
+  query['isActive'] = false;
 
-  let sn = 1;
+  // search term
+  const debouncedSearchTerm = useDebounced({
+    searchQuery: searchText,
+    delay: 600,
+  });
+
+  if (!!debouncedSearchTerm) {
+    query['searchTerm'] = debouncedSearchTerm;
+  }
+
+  const { data, isLoading } = useDriversQuery(
+    { ...query },
+    { refetchOnMountOrArgChange: true }
+  );
+
+  const allDrivers = data?.drivers || [];
+  const meta = data?.meta;
+
+  let sn = page * rowsPerPage + 1;
   return (
     <MainCard title="Inactive Drivers">
       <Box sx={{ mb: 2 }}>
@@ -77,12 +91,10 @@ const InactiveDriver = () => {
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {filterData?.length ? (
-              filterData
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((item) => (
-                  <InactiveDriverRow key={item.id} sn={sn++} data={item} />
-                ))
+            {allDrivers?.length ? (
+              allDrivers.map((item) => (
+                <InactiveDriverRow key={item.id} sn={sn++} data={item} />
+              ))
             ) : (
               <StyledTableRow>
                 <StyledTableCell colSpan={10} sx={{ border: 0 }} align="center">
@@ -100,7 +112,7 @@ const InactiveDriver = () => {
       <TablePagination
         rowsPerPageOptions={[10, 20, 40]}
         component="div"
-        count={filterData?.length || 0}
+        count={meta?.total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

@@ -31,8 +31,13 @@ import Transitions from 'ui-component/extended/Transitions';
 
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons';
-import client from 'api/client';
-import { selectAuth, setAuth } from 'store/authSlice';
+import { useLogoutMutation } from 'store/api/auth/authApi';
+import { removeUserInfo } from 'services/auth.service';
+import { setRefresh } from 'store/refreshSlice';
+import { setToast } from 'store/toastSlice';
+import { authKey } from 'constants/storageKey';
+import { useGetProfileQuery } from 'store/api/profile/profileApi';
+import { roleValue } from 'assets/data';
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -52,20 +57,34 @@ const ProfileSection = () => {
    * */
   const anchorRef = useRef(null);
   const dispatch = useDispatch();
-  const auth = useSelector(selectAuth);
+  const { data } = useGetProfileQuery('', {
+    refetchOnMountOrArgChange: true,
+  });
+  const userData = data?.data;
+
+  const [logout] = useLogoutMutation();
 
   const handleLogout = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await client.get('/auth/logout', {
-        withCredentials: true,
-      });
-      if (response.status === 200) {
-        dispatch(setAuth({}));
+      const res = await logout('').unwrap();
+
+      if (res.success) {
+        removeUserInfo(authKey);
+        dispatch(setRefresh());
         setLoading(false);
       }
     } catch (err) {
-      dispatch(setAuth({}));
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: err?.data?.message || 'Something Went Wrong',
+          errorMessages: err?.data?.errorMessages,
+        })
+      );
+      removeUserInfo(authKey);
+      dispatch(setRefresh());
       setLoading(false);
     }
   };
@@ -186,11 +205,11 @@ const ProfileSection = () => {
                           variant="h4"
                           sx={{ fontWeight: 400 }}
                         >
-                          {auth?.user?.fullName}
+                          {userData?.fullName}
                         </Typography>
                       </Stack>
                       <Typography variant="subtitle2">
-                        {auth?.user?.designation}
+                        {roleValue[userData?.role] || ''}
                       </Typography>
                     </Stack>
                     <Divider />

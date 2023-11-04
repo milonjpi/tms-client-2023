@@ -2,17 +2,15 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import IconButton from '@mui/material/IconButton';
 import { IconEdit, IconTrashXFilled } from '@tabler/icons-react';
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setToast } from 'store/toastSlice';
 import ConfirmDialog from 'ui-component/ConfirmDialog';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import { selectAuth } from 'store/authSlice';
-import { useDeleteTripMutation } from 'store/features/trip/tripApi';
 import moment from 'moment';
 import UpdateTrip from './UpdateTrip';
+import { useDeleteTripMutation } from 'store/api/trip/tripApi';
 
 const AllTripRow = ({ sn, data }) => {
-  const auth = useSelector(selectAuth);
   const vehicle = data?.vehicle;
 
   const [open, setOpen] = useState(false);
@@ -25,10 +23,7 @@ const AllTripRow = ({ sn, data }) => {
   const handleDelete = async () => {
     setDialog(false);
     try {
-      const res = await deleteTrip({
-        id: data?.id,
-        token: auth?.accessToken,
-      }).unwrap();
+      const res = await deleteTrip(data?.id).unwrap();
       if (res.success) {
         dispatch(
           setToast({
