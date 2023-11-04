@@ -34,7 +34,7 @@ const tripApi = api.injectEndpoints({
       query: (data) => ({
         url: `${TRIP_URL}/create`,
         method: 'POST',
-        body: data,
+        data: data,
       }),
       invalidatesTags: ['trip'],
     }),
@@ -44,7 +44,7 @@ const tripApi = api.injectEndpoints({
       query: (data) => ({
         url: `${TRIP_URL}/${data?.id}`,
         method: 'PATCH',
-        data: data,
+        data: data.body,
       }),
       invalidatesTags: ['trip'],
     }),

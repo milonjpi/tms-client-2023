@@ -6,6 +6,8 @@ import Grid from '@mui/material/Grid';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -13,6 +15,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
+import AddIcon from '@mui/icons-material/Add';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
@@ -22,13 +25,14 @@ import { useDriversQuery } from 'store/api/driver/driverApi';
 import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
 import { usePartiesQuery } from 'store/api/party/partyApi';
 import { useAddTripMutation } from 'store/api/trip/tripApi';
+import AddParty from 'views/Libraries/TheParty/ActiveParty/AddParty';
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: 300, sm: 500, md: 600 },
+  width: { xs: 300, sm: 500, md: 700 },
   maxHeight: '100vh',
   overflow: 'auto',
   boxShadow: 24,
@@ -43,6 +47,8 @@ const NewTrip = ({ open, handleClose }) => {
   const [party, setParty] = useState(null);
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm();
+
+  const [partyOpen, setPartyOpen] = useState(false);
 
   // library
   const { data: vehicleData } = useVehiclesQuery(
@@ -128,6 +134,9 @@ const NewTrip = ({ open, handleClose }) => {
           </IconButton>
         </Box>
         <Divider sx={{ mb: 2 }} />
+        {/* popup items */}
+        <AddParty open={partyOpen} handleClose={() => setPartyOpen(false)} />
+        {/* end popup items */}
         <Box
           component="form"
           autoComplete="off"
@@ -239,17 +248,30 @@ const NewTrip = ({ open, handleClose }) => {
               />
             </Grid>
             <Grid item xs={12} md={8}>
-              <ControlledAutoComplete
-                label="Select Party"
-                required
-                value={party}
-                options={allParties}
-                getOptionLabel={(option) =>
-                  option.name + ', ' + option.address + ' - ' + option.mobile
-                }
-                isOptionEqualToValue={(item, value) => item.id === value.id}
-                onChange={(e, newValue) => setParty(newValue)}
-              />
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <ControlledAutoComplete
+                  label="Select Party"
+                  required
+                  value={party}
+                  options={allParties}
+                  getOptionLabel={(option) =>
+                    option.name + ', ' + option.address + ' - ' + option.mobile
+                  }
+                  isOptionEqualToValue={(item, value) => item.id === value.id}
+                  onChange={(e, newValue) => setParty(newValue)}
+                />
+                <Tooltip title="Add Party">
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    sx={{ minWidth: 0, height: 32, width: 38, ml: 1, p: 0 }}
+                    onClick={() => setPartyOpen(true)}
+                  >
+                    <AddIcon fontSize="small" />
+                  </Button>
+                </Tooltip>
+              </Box>
             </Grid>
             <Grid item xs={12} md={4}>
               <TextField
