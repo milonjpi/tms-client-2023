@@ -7,6 +7,15 @@ export const api = createApi({
   baseQuery: axiosBaseQuery({
     baseUrl: BASE_URL,
   }),
-  tagTypes: ['brand', 'model', 'party', 'vehicle', 'driver', 'trip'],
+  tagTypes: [
+    'brand',
+    'model',
+    'party',
+    'vehicle',
+    'driver',
+    'expense-head',
+    'trip',
+    'trip-expense',
+  ],
   endpoints: () => ({}),
 });

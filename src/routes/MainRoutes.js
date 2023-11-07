@@ -36,6 +36,7 @@ const ActiveDriver = Loadable(
 const InactiveDriver = Loadable(
   lazy(() => import('views/Libraries/DriverInfo/InactiveDriver'))
 );
+const ExpenseHead = Loadable(lazy(() => import('views/Libraries/ExpenseHead')));
 const VehicleBrand = Loadable(
   lazy(() => import('views/Libraries/VehicleBrand'))
 );
@@ -200,6 +201,17 @@ const MainRoutes = {
                   ),
                 },
               ],
+            },
+            {
+              path: 'expense-head',
+              element: (
+                <AuthenticationRoutes
+                  allowedRoles={['super_admin', 'admin']}
+                  allowedCodes={['expense-head']}
+                >
+                  <ExpenseHead />
+                </AuthenticationRoutes>
+              ),
             },
             {
               path: 'vehicle-brand',
