@@ -13,39 +13,49 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
-import { useUpdateExpenseHeadMutation } from 'store/api/expenseHead/expenseHeadApi';
+import { useUpdateTripExpenseMutation } from 'store/api/tripExpense/tripExpenseApi';
+import { useGetExpenseHeadsQuery } from 'store/api/expenseHead/expenseHeadApi';
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: 300, sm: 350, md: 400 },
+  width: { xs: 300, sm: 350, md: 600 },
   maxHeight: '100vh',
   overflow: 'auto',
   boxShadow: 24,
   p: 2,
 };
 
-const UpdateExpenseHead = ({ open, handleClose, preData }) => {
+const UpdateTripExpense = ({ open, handleClose, tripId, preData }) => {
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit } = useForm({
-    defaultValues: { label: preData?.label },
-  });
+  const { register, handleSubmit } = useForm({ defaultValues: preData });
+
+  // library
+  const { data: headData } = useGetExpenseHeadsQuery(
+    { limit: 10, type: 'trip', isActive: true, sortOrder: 'asc' },
+    { refetchOnMountOrArgChange: true }
+  );
+
+  const allExpenseHeads = headData?.expenseHeads || [];
+  // end library
 
   const dispatch = useDispatch();
 
-  const [updateExpenseHead] = useUpdateExpenseHeadMutation();
+  const [updateTripExpense] = useUpdateTripExpenseMutation();
 
   const onSubmit = async (data) => {
     const newData = {
-      label: data?.label,
+      data: Object.entries(data).map(([key, value]) => ({
+        expenseHeadId: key,
+        amount: value || 0,
+      })),
     };
-
     try {
       setLoading(true);
-      const res = await updateExpenseHead({
-        id: preData?.id,
+      const res = await updateTripExpense({
+        id: tripId,
         body: newData,
       }).unwrap();
       if (res.success) {
@@ -82,7 +92,7 @@ const UpdateExpenseHead = ({ open, handleClose, preData }) => {
           }}
         >
           <Typography sx={{ fontSize: 16, color: '#878781' }}>
-            Edit Expense Head
+            Edit Trip Expenses
           </Typography>
           <IconButton
             color="error"
@@ -100,17 +110,23 @@ const UpdateExpenseHead = ({ open, handleClose, preData }) => {
         >
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Expense Head"
-                size="small"
-                required
-                {...register('label', {
-                  required: true,
-                })}
-              />
+              <Typography sx={{ fontWeight: 700 }}>Expense Details</Typography>
             </Grid>
-
+            {allExpenseHeads
+              ? allExpenseHeads?.map((el) => (
+                  <Grid key={el.id} item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label={el.label}
+                      size="small"
+                      type="number"
+                      {...register(`${el.id}`, {
+                        valueAsNumber: true,
+                      })}
+                    />
+                  </Grid>
+                ))
+              : null}
             <Grid item xs={12}>
               <LoadingButton
                 fullWidth
@@ -132,4 +148,4 @@ const UpdateExpenseHead = ({ open, handleClose, preData }) => {
   );
 };
 
-export default UpdateExpenseHead;
+export default UpdateTripExpense;

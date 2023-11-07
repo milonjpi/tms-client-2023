@@ -5,13 +5,13 @@ const TRIP_EXPENSE_URL = '/trip-expense';
 const tripExpenseApi = api.injectEndpoints({
   endpoints: (build) => ({
     // create trip expense
-    createTripExpense: build.query({
+    createTripExpense: build.mutation({
       query: (data) => ({
         url: `${TRIP_EXPENSE_URL}/create`,
         method: 'POST',
         data: data,
       }),
-      providesTags: ['trip-expense'],
+      invalidatesTags: ['trip-expense', 'trip'],
     }),
 
     // get trip expenses
@@ -37,7 +37,7 @@ const tripExpenseApi = api.injectEndpoints({
         method: 'PATCH',
         data: data?.body,
       }),
-      invalidatesTags: ['trip-expense'],
+      invalidatesTags: ['trip-expense', 'trip'],
     }),
 
     // delete expenses
@@ -46,13 +46,13 @@ const tripExpenseApi = api.injectEndpoints({
         url: `${TRIP_EXPENSE_URL}/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['trip-expense'],
+      invalidatesTags: ['trip-expense', 'trip'],
     }),
   }),
 });
 
 export const {
-  useCreateTripExpenseQuery,
+  useCreateTripExpenseMutation,
   useGetTripExpensesQuery,
   useUpdateTripExpenseMutation,
   useDeleteTripExpenseMutation,

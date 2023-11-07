@@ -1,6 +1,8 @@
 import ButtonGroup from '@mui/material/ButtonGroup';
 import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import { IconEdit, IconTrashXFilled } from '@tabler/icons-react';
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setToast } from 'store/toastSlice';
@@ -43,27 +45,34 @@ const ExpenseHeadRow = ({ sn, data }) => {
   return (
     <StyledTableRow>
       <StyledTableCell align="center">{sn}</StyledTableCell>
-      <StyledTableCell>{data?.label}</StyledTableCell>
       <StyledTableCell sx={{ textTransform: 'capitalize' }}>
         {data?.type + ' Expense'}
       </StyledTableCell>
+      <StyledTableCell>{data?.label}</StyledTableCell>
       <StyledTableCell align="center">
-        <ButtonGroup>
-          <IconButton
-            color="primary"
-            size="small"
-            onClick={() => setOpen(true)}
-          >
-            <IconEdit color="#468B97" size={18} />
-          </IconButton>
-          <IconButton
-            size="small"
-            color="error"
-            onClick={() => setDialog(true)}
-          >
-            <IconTrashXFilled size={18} />
-          </IconButton>
-        </ButtonGroup>
+        {data?.type === 'trip' ? (
+          <Tooltip title="Not Editable">
+            <ArticleOutlinedIcon />
+          </Tooltip>
+        ) : (
+          <ButtonGroup>
+            <IconButton
+              color="primary"
+              size="small"
+              onClick={() => setOpen(true)}
+            >
+              <IconEdit color="#468B97" size={18} />
+            </IconButton>
+            <IconButton
+              size="small"
+              color="error"
+              onClick={() => setDialog(true)}
+            >
+              <IconTrashXFilled size={18} />
+            </IconButton>
+          </ButtonGroup>
+        )}
+
         <ConfirmDialog
           open={dialog}
           setOpen={setDialog}

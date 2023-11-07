@@ -8,6 +8,10 @@ import TableHead from '@mui/material/TableHead';
 import InputBase from '@mui/material/InputBase';
 import InputAdornment from '@mui/material/InputAdornment';
 import LinearProgress from '@mui/material/LinearProgress';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 import SearchIcon from '@mui/icons-material/Search';
 import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
@@ -20,6 +24,7 @@ import AddExpenseHead from './AddExpenseHead';
 
 const ExpenseHead = () => {
   const [searchText, setSearchText] = useState('');
+  const [type, setType] = useState('all');
 
   const [open, setOpen] = useState(false);
 
@@ -43,6 +48,11 @@ const ExpenseHead = () => {
   query['limit'] = rowsPerPage;
   query['page'] = page;
   query['isActive'] = true;
+
+  // expense type
+  if (type !== 'all') {
+    query['type'] = type;
+  }
 
   // search term
   const debouncedSearchTerm = useDebounced({
@@ -76,7 +86,7 @@ const ExpenseHead = () => {
     >
       <Box sx={{ mb: 2 }}>
         <Grid container spacing={2} sx={{ alignItems: 'end' }}>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={5}>
             <InputBase
               fullWidth
               placeholder="Search..."
@@ -89,6 +99,21 @@ const ExpenseHead = () => {
                 </InputAdornment>
               }
             />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="select-type-id">Expense Type</InputLabel>
+              <Select
+                labelId="select-type-id"
+                value={type}
+                label="Expense Type"
+                onChange={(e) => setType(e.target.value)}
+              >
+                <MenuItem value="all">All</MenuItem>
+                <MenuItem value="trip">Trip Expense</MenuItem>
+                <MenuItem value="general">General Expense</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
         </Grid>
       </Box>

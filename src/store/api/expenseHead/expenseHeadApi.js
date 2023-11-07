@@ -11,7 +11,7 @@ const expenseHeadApi = api.injectEndpoints({
         method: 'POST',
         data: data,
       }),
-      providesTags: ['expense-head'],
+      invalidatesTags: ['expense-head'],
     }),
 
     // get expense heads
