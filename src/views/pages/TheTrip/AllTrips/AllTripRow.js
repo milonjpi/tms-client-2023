@@ -1,6 +1,10 @@
 import ButtonGroup from '@mui/material/ButtonGroup';
 import IconButton from '@mui/material/IconButton';
-import { IconEdit, IconTrashXFilled } from '@tabler/icons-react';
+import {
+  IconEdit,
+  IconTrashXFilled,
+  IconListSearch,
+} from '@tabler/icons-react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setToast } from 'store/toastSlice';
@@ -9,12 +13,15 @@ import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
 import moment from 'moment';
 import UpdateTrip from './UpdateTrip';
 import { useDeleteTripMutation } from 'store/api/trip/tripApi';
+import { totalSum } from 'views/utilities/NeedyFunction';
+import TripInvoice from './TripInvoice';
 
 const AllTripRow = ({ sn, data }) => {
   const vehicle = data?.vehicle;
 
   const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState(false);
+  const [invoice, setInvoice] = useState(false);
 
   const [deleteTrip] = useDeleteTripMutation();
 
@@ -43,6 +50,9 @@ const AllTripRow = ({ sn, data }) => {
       );
     }
   };
+  const tripExpenses = data?.tripExpenses || [];
+  const totalExpenses = totalSum(tripExpenses, 'amount');
+  const netProfit = (data?.tripValue || 0) - (totalExpenses || 0);
   return (
     <StyledTableRow>
       <StyledTableCell align="center">{sn}</StyledTableCell>
@@ -54,6 +64,17 @@ const AllTripRow = ({ sn, data }) => {
       <StyledTableCell>{data?.from + ' to ' + data?.to}</StyledTableCell>
       <StyledTableCell align="right">{data?.distance}</StyledTableCell>
       <StyledTableCell align="right">{data?.tripValue}</StyledTableCell>
+      <StyledTableCell align="right">{totalExpenses}</StyledTableCell>
+      <StyledTableCell align="right">{netProfit}</StyledTableCell>
+      <StyledTableCell align="center">
+        <IconButton
+          color="secondary"
+          size="small"
+          onClick={() => setInvoice(true)}
+        >
+          <IconListSearch size={20} color="#614cab" />
+        </IconButton>
+      </StyledTableCell>
       <StyledTableCell align="center">
         <ButtonGroup>
           <IconButton
@@ -71,6 +92,11 @@ const AllTripRow = ({ sn, data }) => {
             <IconTrashXFilled size={18} />
           </IconButton>
         </ButtonGroup>
+        <TripInvoice
+          open={invoice}
+          handleClose={() => setInvoice(false)}
+          data={data}
+        />
         <ConfirmDialog
           open={dialog}
           setOpen={setDialog}

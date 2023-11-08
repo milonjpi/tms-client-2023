@@ -106,6 +106,9 @@ const AllTrips = () => {
               <StyledTableCell>Destination</StyledTableCell>
               <StyledTableCell align="right">Distance</StyledTableCell>
               <StyledTableCell align="right">Trip Value</StyledTableCell>
+              <StyledTableCell align="right">Trip Expenses</StyledTableCell>
+              <StyledTableCell align="right">Net Profit</StyledTableCell>
+              <StyledTableCell align="center">Invoice</StyledTableCell>
               <StyledTableCell align="center">Action</StyledTableCell>
             </StyledTableRow>
           </TableHead>

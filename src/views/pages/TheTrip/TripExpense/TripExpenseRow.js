@@ -55,9 +55,11 @@ const TripExpenseRow = ({ sn, data }) => {
       </StyledTableCell>
       <StyledTableCell>{data?.tripId}</StyledTableCell>
       <StyledTableCell>{data?.from + '-' + data?.to}</StyledTableCell>
-      <StyledTableCell>{data?.tripValue}</StyledTableCell>
+      <StyledTableCell align="right">{data?.tripValue}</StyledTableCell>
       {data?.tripExpenses?.map((el) => (
-        <StyledTableCell key={el.id}>{el?.amount}</StyledTableCell>
+        <StyledTableCell key={el.id} align="right">
+          {el?.amount}
+        </StyledTableCell>
       ))}
       <StyledTableCell align="center">
         <ButtonGroup>

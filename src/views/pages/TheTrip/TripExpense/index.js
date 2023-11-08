@@ -103,13 +103,13 @@ const TripExpense = () => {
               <StyledTableCell>Trip Date</StyledTableCell>
               <StyledTableCell>Trip ID</StyledTableCell>
               <StyledTableCell>Destination</StyledTableCell>
-              <StyledTableCell>Trip Value</StyledTableCell>
-              <StyledTableCell>Fuel Cost</StyledTableCell>
-              <StyledTableCell>Driver Bill</StyledTableCell>
-              <StyledTableCell>Helper Bill</StyledTableCell>
-              <StyledTableCell>Food Allowance</StyledTableCell>
-              <StyledTableCell>Toll Fee</StyledTableCell>
-              <StyledTableCell>Other Expenses</StyledTableCell>
+              <StyledTableCell align="right">Trip Value</StyledTableCell>
+              <StyledTableCell align="right">Fuel Cost</StyledTableCell>
+              <StyledTableCell align="right">Driver Bill</StyledTableCell>
+              <StyledTableCell align="right">Helper Bill</StyledTableCell>
+              <StyledTableCell align="right">Food Allowance</StyledTableCell>
+              <StyledTableCell align="right">Toll Fee</StyledTableCell>
+              <StyledTableCell align="right">Other Expenses</StyledTableCell>
               <StyledTableCell align="center">Action</StyledTableCell>
             </StyledTableRow>
           </TableHead>
