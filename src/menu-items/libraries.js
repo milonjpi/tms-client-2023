@@ -7,6 +7,8 @@ import {
   IconCoinOff,
   IconBadgeTm,
   IconBrandVolkswagen,
+  IconRulerMeasure,
+  IconDropletHalf2Filled,
 } from '@tabler/icons-react';
 
 // constant
@@ -18,6 +20,8 @@ const icons = {
   IconCoinOff,
   IconBadgeTm,
   IconBrandVolkswagen,
+  IconRulerMeasure,
+  IconDropletHalf2Filled,
 };
 
 // ==============================|| UTILITIES MENU ITEMS ||============================== //
@@ -31,7 +35,7 @@ const libraries = {
       id: 'party',
       title: 'The Party',
       type: 'collapse',
-      color: '#461959',
+      color: '#2F0F5D',
       icon: icons.IconUsers,
       children: [
         {
@@ -52,7 +56,7 @@ const libraries = {
       id: 'vehicle',
       title: 'Vehicle Info',
       type: 'collapse',
-      color: '#557A46',
+      color: '#2F0F5D',
       icon: icons.IconTruck,
       children: [
         {
@@ -73,7 +77,7 @@ const libraries = {
       id: 'driver',
       title: 'Driver Info',
       type: 'collapse',
-      color: '#1D5D9B',
+      color: '#2F0F5D',
       icon: icons.IconUser,
       children: [
         {
@@ -94,7 +98,7 @@ const libraries = {
       id: 'accessories',
       title: 'Accessories List',
       type: 'item',
-      color: '#176B87',
+      color: '#2F0F5D',
       icon: icons.IconSteeringWheel,
       url: '/libraries/accessories',
     },
@@ -102,7 +106,7 @@ const libraries = {
       id: 'expense-head',
       title: 'Expense Head',
       type: 'item',
-      color: '#B31312',
+      color: '#2F0F5D',
       icon: icons.IconCoinOff,
       url: '/libraries/expense-head',
     },
@@ -110,7 +114,7 @@ const libraries = {
       id: 'vehicle-brand',
       title: 'Vehicle Brand',
       type: 'item',
-      color: '#004225',
+      color: '#2F0F5D',
       icon: icons.IconBadgeTm,
       url: '/libraries/vehicle-brand',
     },
@@ -118,9 +122,25 @@ const libraries = {
       id: 'vehicle-model',
       title: 'Vehicle Model',
       type: 'item',
-      color: '#F39F5A',
+      color: '#2F0F5D',
       icon: icons.IconBrandVolkswagen,
       url: '/libraries/vehicle-model',
+    },
+    {
+      id: 'uom',
+      title: 'Unit of Measurement',
+      type: 'item',
+      color: '#2F0F5D',
+      icon: icons.IconRulerMeasure,
+      url: '/libraries/uom',
+    },
+    {
+      id: 'fuel-type',
+      title: 'Fuel Type',
+      type: 'item',
+      color: '#2F0F5D',
+      icon: icons.IconDropletHalf2Filled,
+      url: '/libraries/fuel-type',
     },
   ],
 };

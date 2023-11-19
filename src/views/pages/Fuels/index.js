@@ -13,11 +13,12 @@ import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import VehicleBrandRow from './VehicleBrandRow';
-import AddVehicleBrand from './AddVehicleBrand';
-import { useBrandsQuery } from 'store/api/brand/brandApi';
+import { useDebounced } from 'hooks';
+import { useGetFuelsQuery } from 'store/api/fuel/fuelApi';
+import AddFuel from './AddFuel';
+import FuelRow from './FuelRow';
 
-const VehicleBrand = () => {
+const Fuels = () => {
   const [searchText, setSearchText] = useState('');
 
   const [open, setOpen] = useState(false);
@@ -36,24 +37,37 @@ const VehicleBrand = () => {
   };
   // end pagination
 
-  const { data, isLoading } = useBrandsQuery('', {
-    refetchOnMountOrArgChange: true,
+  // filtering
+  const query = {};
+
+  query['limit'] = rowsPerPage;
+  query['page'] = page;
+
+  // search term
+  const debouncedSearchTerm = useDebounced({
+    searchQuery: searchText,
+    delay: 600,
   });
-  const allBrands = data?.data;
 
-  const filterData = allBrands
-    ?.filter((item) =>
-      item.label?.toLowerCase().includes(searchText?.toLowerCase())
-    )
-    .sort((a, b) => a.label.localeCompare(b.label));
+  if (!!debouncedSearchTerm) {
+    query['searchTerm'] = debouncedSearchTerm;
+  }
 
-    let sn = page * rowsPerPage + 1;
+  const { data, isLoading } = useGetFuelsQuery(
+    { ...query },
+    { refetchOnMountOrArgChange: true }
+  );
+
+  const allFuels = data?.fuels || [];
+  const meta = data?.meta;
+
+  let sn = page * rowsPerPage + 1;
   return (
     <MainCard
-      title="Brands"
+      title="The Fuels"
       secondary={
         <CardAction
-          title="Add Brand"
+          title="Add Fuel"
           onClick={() => setOpen(true)}
           icon={<IconPlus />}
         />
@@ -79,24 +93,30 @@ const VehicleBrand = () => {
       </Box>
       {/* popup items */}
 
-      <AddVehicleBrand open={open} handleClose={() => setOpen(false)} />
+      <AddFuel open={open} handleClose={() => setOpen(false)} />
       {/* end popup items */}
       <Box sx={{ overflow: 'auto' }}>
         <Table sx={{ minWidth: 400 }}>
           <TableHead>
             <StyledTableRow>
               <StyledTableCell align="center">SN</StyledTableCell>
-              <StyledTableCell>Brand</StyledTableCell>
+              <StyledTableCell>Date</StyledTableCell>
+              <StyledTableCell>Vehicle</StyledTableCell>
+              <StyledTableCell>Fuel Type</StyledTableCell>
+              <StyledTableCell>UOM</StyledTableCell>
+              <StyledTableCell align="right">Quantity</StyledTableCell>
+              <StyledTableCell align="right">
+                Amount&#40;TK&#41;
+              </StyledTableCell>
+              <StyledTableCell>Remarks</StyledTableCell>
               <StyledTableCell align="center">Action</StyledTableCell>
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {filterData?.length ? (
-              filterData
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((item) => (
-                  <VehicleBrandRow key={item.id} sn={sn++} data={item} />
-                ))
+            {allFuels?.length ? (
+              allFuels.map((item) => (
+                <FuelRow key={item.id} sn={sn++} data={item} />
+              ))
             ) : (
               <StyledTableRow>
                 <StyledTableCell colSpan={10} sx={{ border: 0 }} align="center">
@@ -114,7 +134,7 @@ const VehicleBrand = () => {
       <TablePagination
         rowsPerPageOptions={[10, 20, 40]}
         component="div"
-        count={filterData?.length || 0}
+        count={meta?.total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -124,4 +144,4 @@ const VehicleBrand = () => {
   );
 };
 
-export default VehicleBrand;
+export default Fuels;

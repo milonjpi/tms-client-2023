@@ -16,6 +16,7 @@ const AllTrips = Loadable(lazy(() => import('views/pages/TheTrip/AllTrips')));
 const TripExpense = Loadable(
   lazy(() => import('views/pages/TheTrip/TripExpense'))
 );
+const Fuels = Loadable(lazy(() => import('views/pages/Fuels')));
 
 // libraries
 const ActiveParty = Loadable(
@@ -43,6 +44,8 @@ const VehicleBrand = Loadable(
 const VehicleModel = Loadable(
   lazy(() => import('views/Libraries/VehicleModel'))
 );
+const Uom = Loadable(lazy(() => import('views/Libraries/Uom')));
+const FuelType = Loadable(lazy(() => import('views/Libraries/FuelType')));
 
 // utilities routing
 
@@ -115,6 +118,17 @@ const MainRoutes = {
                   ),
                 },
               ],
+            },
+            {
+              path: 'fuel',
+              element: (
+                <AuthenticationRoutes
+                  allowedRoles={['super_admin', 'admin']}
+                  allowedCodes={['fuel']}
+                >
+                  <Fuels />
+                </AuthenticationRoutes>
+              ),
             },
           ],
         },
@@ -232,6 +246,28 @@ const MainRoutes = {
                   allowedCodes={['vehicle-model']}
                 >
                   <VehicleModel />
+                </AuthenticationRoutes>
+              ),
+            },
+            {
+              path: 'uom',
+              element: (
+                <AuthenticationRoutes
+                  allowedRoles={['super_admin', 'admin']}
+                  allowedCodes={['uom']}
+                >
+                  <Uom />
+                </AuthenticationRoutes>
+              ),
+            },
+            {
+              path: 'fuel-type',
+              element: (
+                <AuthenticationRoutes
+                  allowedRoles={['super_admin', 'admin']}
+                  allowedCodes={['fuel-type']}
+                >
+                  <FuelType />
                 </AuthenticationRoutes>
               ),
             },

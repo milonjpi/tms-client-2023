@@ -47,7 +47,7 @@ const VehicleModel = () => {
     )
     .sort((a, b) => a.label.localeCompare(b.label));
 
-  let sn = 1;
+    let sn = page * rowsPerPage + 1;
   return (
     <MainCard
       title="Models"

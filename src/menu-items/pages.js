@@ -29,7 +29,7 @@ const pages = {
       id: 'trip',
       title: 'The Trip',
       type: 'collapse',
-      color: '#747ba0',
+      color: '#2F0F5D',
       icon: icons.IconTruckDelivery,
       children: [
         {
@@ -50,36 +50,23 @@ const pages = {
       id: 'fuel',
       title: 'Fuel',
       type: 'item',
-      color: '#068DA9',
+      color: '#2F0F5D',
       icon: icons.IconGasStation,
-      url: '/page/fuel',
+      url: '/pages/fuel',
     },
     {
       id: 'expense',
       title: 'Expenses',
-      type: 'collapse',
-      color: '#ff2825',
+      type: 'item',
+      color: '#2F0F5D',
       icon: icons.IconCashOff,
-      children: [
-        {
-          id: 'trip-expense',
-          title: 'Trip Expenses',
-          type: 'item',
-          url: '/pages/expense/trip-expense',
-        },
-        {
-          id: 'fixed-expense',
-          title: 'Fixed Expenses',
-          type: 'item',
-          url: '/pages/expense/fixed-expense',
-        },
-      ],
+      url: '/pages/expense',
     },
     {
       id: 'maintenance',
       title: 'Maintenance',
       type: 'collapse',
-      color: '#7f5345',
+      color: '#2F0F5D',
       icon: icons.IconTool,
       children: [
         {
@@ -107,7 +94,7 @@ const pages = {
       id: 'paper',
       title: 'Paper Work',
       type: 'collapse',
-      color: '#6f32be',
+      color: '#2F0F5D',
       icon: icons.IconFileCertificate,
       children: [
         {
@@ -134,7 +121,7 @@ const pages = {
       id: 'report',
       title: 'Report',
       type: 'collapse',
-      color: '#0066ff',
+      color: '#2F0F5D',
       icon: icons.IconReport,
       children: [
         {

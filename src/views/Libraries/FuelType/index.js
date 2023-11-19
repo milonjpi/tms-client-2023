@@ -13,11 +13,11 @@ import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import VehicleBrandRow from './VehicleBrandRow';
-import AddVehicleBrand from './AddVehicleBrand';
-import { useBrandsQuery } from 'store/api/brand/brandApi';
+import AddFuelType from './AddFuelType';
+import { useFuelTypeQuery } from 'store/api/fuelType/fuelTypeApi';
+import FuelTypeRow from './FuelTypeRow';
 
-const VehicleBrand = () => {
+const FuelType = () => {
   const [searchText, setSearchText] = useState('');
 
   const [open, setOpen] = useState(false);
@@ -36,24 +36,22 @@ const VehicleBrand = () => {
   };
   // end pagination
 
-  const { data, isLoading } = useBrandsQuery('', {
+  const { data, isLoading } = useFuelTypeQuery('', {
     refetchOnMountOrArgChange: true,
   });
-  const allBrands = data?.data;
+  const allFuelTypes = data?.data;
 
-  const filterData = allBrands
-    ?.filter((item) =>
-      item.label?.toLowerCase().includes(searchText?.toLowerCase())
-    )
-    .sort((a, b) => a.label.localeCompare(b.label));
+  const filterData = allFuelTypes?.filter((item) =>
+    item.label?.toLowerCase().includes(searchText?.toLowerCase())
+  );
 
-    let sn = page * rowsPerPage + 1;
+  let sn = page * rowsPerPage + 1;
   return (
     <MainCard
-      title="Brands"
+      title="Fuel Types"
       secondary={
         <CardAction
-          title="Add Brand"
+          title="Add Fuel Type"
           onClick={() => setOpen(true)}
           icon={<IconPlus />}
         />
@@ -79,14 +77,14 @@ const VehicleBrand = () => {
       </Box>
       {/* popup items */}
 
-      <AddVehicleBrand open={open} handleClose={() => setOpen(false)} />
+      <AddFuelType open={open} handleClose={() => setOpen(false)} />
       {/* end popup items */}
       <Box sx={{ overflow: 'auto' }}>
         <Table sx={{ minWidth: 400 }}>
           <TableHead>
             <StyledTableRow>
               <StyledTableCell align="center">SN</StyledTableCell>
-              <StyledTableCell>Brand</StyledTableCell>
+              <StyledTableCell>Fuel Type</StyledTableCell>
               <StyledTableCell align="center">Action</StyledTableCell>
             </StyledTableRow>
           </TableHead>
@@ -95,7 +93,7 @@ const VehicleBrand = () => {
               filterData
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((item) => (
-                  <VehicleBrandRow key={item.id} sn={sn++} data={item} />
+                  <FuelTypeRow key={item.id} sn={sn++} data={item} />
                 ))
             ) : (
               <StyledTableRow>
@@ -124,4 +122,4 @@ const VehicleBrand = () => {
   );
 };
 
-export default VehicleBrand;
+export default FuelType;

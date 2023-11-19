@@ -17,6 +17,7 @@ const dashboard = {
       type: 'item',
       url: '/dashboard/default',
       icon: icons.IconDashboard,
+      color: '#2F0F5D',
       breadcrumbs: false,
     },
   ],

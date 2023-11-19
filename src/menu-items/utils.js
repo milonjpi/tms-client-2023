@@ -31,6 +31,7 @@ const utils = {
       title: 'Support',
       type: 'item',
       url: '/utils/support',
+      color: '#2F0F5D',
       icon: icons.IconHelp,
       // external: true,
       // target: true

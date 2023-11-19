@@ -16,6 +16,9 @@ export const api = createApi({
     'expense-head',
     'trip',
     'trip-expense',
+    'uom',
+    'fuelType',
+    'fuel',
   ],
   endpoints: () => ({}),
 });
