@@ -19,6 +19,7 @@ export const api = createApi({
     'uom',
     'fuelType',
     'fuel',
+    'expense',
   ],
   endpoints: () => ({}),
 });

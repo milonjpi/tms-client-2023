@@ -2,7 +2,7 @@ import { api } from '../../api/apiSlice';
 
 const FUEL_URL = '/fuel';
 
-const uomApi = api.injectEndpoints({
+const fuelApi = api.injectEndpoints({
   endpoints: (build) => ({
     // get all fuels
     getFuels: build.query({
@@ -65,4 +65,4 @@ export const {
   useAddFuelMutation,
   useUpdateFuelMutation,
   useDeleteFuelMutation,
-} = uomApi;
+} = fuelApi;

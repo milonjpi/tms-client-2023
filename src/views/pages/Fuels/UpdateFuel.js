@@ -135,7 +135,7 @@ const UpdateFuel = ({ open, handleClose, preData }) => {
               <LocalizationProvider dateAdapter={AdapterMoment}>
                 <DatePicker
                   disableFuture
-                  label="Start Date"
+                  label="Select Date"
                   views={['year', 'month', 'day']}
                   inputFormat="DD/MM/YYYY"
                   value={date}

@@ -6,7 +6,7 @@ import Loadable from 'ui-component/Loadable';
 import { Navigate } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
 import AuthenticationRoutes from './AuthenticationRoutes';
-
+import Expenses from 'views/pages/Expenses';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
@@ -127,6 +127,17 @@ const MainRoutes = {
                   allowedCodes={['fuel']}
                 >
                   <Fuels />
+                </AuthenticationRoutes>
+              ),
+            },
+            {
+              path: 'expense',
+              element: (
+                <AuthenticationRoutes
+                  allowedRoles={['super_admin', 'admin']}
+                  allowedCodes={['expense']}
+                >
+                  <Expenses />
                 </AuthenticationRoutes>
               ),
             },

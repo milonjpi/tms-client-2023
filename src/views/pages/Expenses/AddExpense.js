@@ -16,12 +16,11 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
-import { useAddFuelMutation } from 'store/api/fuel/fuelApi';
 import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
-import { useUomQuery } from 'store/api/uom/uomApi';
-import { useFuelTypeQuery } from 'store/api/fuelType/fuelTypeApi';
 import moment from 'moment';
 import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
+import { useGetExpenseHeadsQuery } from 'store/api/expenseHead/expenseHeadApi';
+import { useAddExpenseMutation } from 'store/api/expense/expenseApi';
 
 const style = {
   position: 'absolute',
@@ -35,12 +34,11 @@ const style = {
   p: 2,
 };
 
-const AddFuel = ({ open, handleClose }) => {
+const AddExpense = ({ open, handleClose }) => {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(moment());
   const [vehicle, setVehicle] = useState(null);
-  const [uom, setUom] = useState(null);
-  const [fuelType, setFuelType] = useState(null);
+  const [expense, setExpense] = useState(null);
   const { register, handleSubmit, reset } = useForm();
 
   // library
@@ -50,41 +48,36 @@ const AddFuel = ({ open, handleClose }) => {
   );
   const allVehicles = vehicleData?.vehicles || [];
 
-  const { data: uomData } = useUomQuery('', {
-    refetchOnMountOrArgChange: true,
-  });
-  const allUom = uomData?.data || [];
+  const { data: headData } = useGetExpenseHeadsQuery(
+    { limit: 100, type: 'general', isActive: true, sortOrder: 'asc' },
+    { refetchOnMountOrArgChange: true }
+  );
 
-  const { data: fuelTypeData } = useFuelTypeQuery('', {
-    refetchOnMountOrArgChange: true,
-  });
-  const allFuelTypes = fuelTypeData?.data || [];
+  const allExpenseHeads = headData?.expenseHeads || [];
+
   // end library
 
   const dispatch = useDispatch();
 
-  const [addFuel] = useAddFuelMutation();
+  const [addExpense] = useAddExpenseMutation();
   const onSubmit = async (data) => {
     const newData = {
       date,
       vehicleId: vehicle?.id,
-      fuelTypeId: fuelType?.id,
-      uomId: uom?.id,
-      quantity: data?.quantity,
+      expenseHeadId: expense?.id,
+      description: data?.description,
       amount: data?.amount,
-      remarks: data?.remarks,
     };
     try {
       setLoading(true);
-      const res = await addFuel({ ...newData }).unwrap();
+      const res = await addExpense({ ...newData }).unwrap();
       if (res.success) {
         handleClose();
         setLoading(false);
         reset();
         setDate(moment());
         setVehicle(null);
-        setUom(null);
-        setFuelType(null);
+        setExpense(null);
         dispatch(
           setToast({
             open: true,
@@ -116,7 +109,7 @@ const AddFuel = ({ open, handleClose }) => {
           }}
         >
           <Typography sx={{ fontSize: 16, color: '#878781' }}>
-            Add Fuel
+            Add Expense
           </Typography>
           <IconButton
             color="error"
@@ -171,40 +164,13 @@ const AddFuel = ({ open, handleClose }) => {
             </Grid>
             <Grid item xs={12} md={6}>
               <ControlledAutoComplete
-                label="Select Fuel Type"
+                label="Select Expense Head"
                 required
-                value={fuelType}
-                options={allFuelTypes}
+                value={expense}
+                options={allExpenseHeads}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(item, value) => item.id === value.id}
-                onChange={(e, newValue) => setFuelType(newValue)}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <ControlledAutoComplete
-                label="Unit of Measurement"
-                required
-                value={uom}
-                options={allUom}
-                getOptionLabel={(option) => option.label}
-                isOptionEqualToValue={(item, value) => item.id === value.id}
-                onChange={(e, newValue) => setUom(newValue)}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                required
-                label="Quantity"
-                size="small"
-                type="number"
-                inputProps={{
-                  step: '0.0001',
-                }}
-                {...register('quantity', {
-                  required: true,
-                  valueAsNumber: true,
-                })}
+                onChange={(e, newValue) => setExpense(newValue)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -223,11 +189,15 @@ const AddFuel = ({ open, handleClose }) => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Remarks"
+                required
+                label="Description"
                 size="small"
-                {...register('remarks')}
+                {...register('description', {
+                  required: true,
+                })}
               />
             </Grid>
+
             <Grid item xs={12}>
               <LoadingButton
                 fullWidth
@@ -249,4 +219,4 @@ const AddFuel = ({ open, handleClose }) => {
   );
 };
 
-export default AddFuel;
+export default AddExpense;
