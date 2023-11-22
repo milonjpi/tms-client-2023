@@ -18,7 +18,6 @@ import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
 import { useAddFuelMutation } from 'store/api/fuel/fuelApi';
 import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
-import { useUomQuery } from 'store/api/uom/uomApi';
 import { useFuelTypeQuery } from 'store/api/fuelType/fuelTypeApi';
 import moment from 'moment';
 import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
@@ -39,7 +38,6 @@ const AddFuel = ({ open, handleClose }) => {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(moment());
   const [vehicle, setVehicle] = useState(null);
-  const [uom, setUom] = useState(null);
   const [fuelType, setFuelType] = useState(null);
   const { register, handleSubmit, reset } = useForm();
 
@@ -49,11 +47,6 @@ const AddFuel = ({ open, handleClose }) => {
     { refetchOnMountOrArgChange: true }
   );
   const allVehicles = vehicleData?.vehicles || [];
-
-  const { data: uomData } = useUomQuery('', {
-    refetchOnMountOrArgChange: true,
-  });
-  const allUom = uomData?.data || [];
 
   const { data: fuelTypeData } = useFuelTypeQuery('', {
     refetchOnMountOrArgChange: true,
@@ -69,7 +62,6 @@ const AddFuel = ({ open, handleClose }) => {
       date,
       vehicleId: vehicle?.id,
       fuelTypeId: fuelType?.id,
-      uomId: uom?.id,
       quantity: data?.quantity,
       amount: data?.amount,
       remarks: data?.remarks,
@@ -83,7 +75,6 @@ const AddFuel = ({ open, handleClose }) => {
         reset();
         setDate(moment());
         setVehicle(null);
-        setUom(null);
         setFuelType(null);
         dispatch(
           setToast({
@@ -169,7 +160,7 @@ const AddFuel = ({ open, handleClose }) => {
                 onChange={(e, newValue) => setVehicle(newValue)}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <ControlledAutoComplete
                 label="Select Fuel Type"
                 required
@@ -180,18 +171,7 @@ const AddFuel = ({ open, handleClose }) => {
                 onChange={(e, newValue) => setFuelType(newValue)}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
-              <ControlledAutoComplete
-                label="Unit of Measurement"
-                required
-                value={uom}
-                options={allUom}
-                getOptionLabel={(option) => option.label}
-                isOptionEqualToValue={(item, value) => item.id === value.id}
-                onChange={(e, newValue) => setUom(newValue)}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
                 required
@@ -207,7 +187,7 @@ const AddFuel = ({ open, handleClose }) => {
                 })}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
                 required
