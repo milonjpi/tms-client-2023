@@ -6,46 +6,50 @@ import Loadable from 'ui-component/Loadable';
 import { Navigate } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
 import AuthenticationRoutes from './AuthenticationRoutes';
-import Expenses from 'views/pages/Expenses';
+// import Expenses from 'views/pages/Expenses';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
 
 // pages routing
-const AllTrips = Loadable(lazy(() => import('views/pages/TheTrip/AllTrips')));
+// vehicle management
+const VehicleBrand = Loadable(
+  lazy(() => import('views/pages/VehicleManagement/VehicleBrand'))
+);
+const VehicleModel = Loadable(
+  lazy(() => import('views/pages/VehicleManagement/VehicleModel'))
+);
+const Vehicles = Loadable(
+  lazy(() => import('views/pages/VehicleManagement/Vehicles'))
+);
+
+// driver management
+const Drivers = Loadable(
+  lazy(() => import('views/pages/DriverManagement/Drivers'))
+);
+
+// trip management
+const Parties = Loadable(
+  lazy(() => import('views/pages/TripManagement/Parties'))
+);
+const AllTrips = Loadable(
+  lazy(() => import('views/pages/TripManagement/AllTrips'))
+);
+
+// fuel management
+const FuelTypes = Loadable(
+  lazy(() => import('views/pages/FuelManagement/FuelTypes'))
+);
+const FuelLogs = Loadable(
+  lazy(() => import('views/pages/FuelManagement/FuelLogs'))
+);
+
 const TripExpense = Loadable(
   lazy(() => import('views/pages/TheTrip/TripExpense'))
 );
-const Fuels = Loadable(lazy(() => import('views/pages/Fuels')));
 
-// libraries
-const ActiveParty = Loadable(
-  lazy(() => import('views/Libraries/TheParty/ActiveParty'))
-);
-const InactiveParty = Loadable(
-  lazy(() => import('views/Libraries/TheParty/InactiveParty'))
-);
-const ActiveVehicle = Loadable(
-  lazy(() => import('views/Libraries/VehicleInfo/ActiveVehicle'))
-);
-const InactiveVehicle = Loadable(
-  lazy(() => import('views/Libraries/VehicleInfo/InactiveVehicle'))
-);
-const ActiveDriver = Loadable(
-  lazy(() => import('views/Libraries/DriverInfo/ActiveDriver'))
-);
-const InactiveDriver = Loadable(
-  lazy(() => import('views/Libraries/DriverInfo/InactiveDriver'))
-);
-const ExpenseHead = Loadable(lazy(() => import('views/Libraries/ExpenseHead')));
-const VehicleBrand = Loadable(
-  lazy(() => import('views/Libraries/VehicleBrand'))
-);
-const VehicleModel = Loadable(
-  lazy(() => import('views/Libraries/VehicleModel'))
-);
-const Uom = Loadable(lazy(() => import('views/Libraries/Uom')));
-const FuelType = Loadable(lazy(() => import('views/Libraries/FuelType')));
+// store management
+const Uom = Loadable(lazy(() => import('views/pages/StoreManagement/Uom')));
 
 // utilities routing
 
@@ -93,6 +97,130 @@ const MainRoutes = {
           path: 'pages',
           children: [
             {
+              path: 'vehicle-management',
+              children: [
+                {
+                  path: 'brands',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['brands']}
+                    >
+                      <VehicleBrand />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'models',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['models']}
+                    >
+                      <VehicleModel />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'vehicles',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['vehicles']}
+                    >
+                      <Vehicles />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'driver-management',
+              children: [
+                {
+                  path: 'drivers',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['drivers']}
+                    >
+                      <Drivers />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'trip-management',
+              children: [
+                {
+                  path: 'parties',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['parties']}
+                    >
+                      <Parties />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'all-trips',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['all-trips']}
+                    >
+                      <AllTrips />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'fuel-management',
+              children: [
+                {
+                  path: 'fuel-types',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['fuel-types']}
+                    >
+                      <FuelTypes />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'fuel-logs',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['fuel-logs']}
+                    >
+                      <FuelLogs />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'store-management',
+              children: [
+                {
+                  path: 'uom',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['uom']}
+                    >
+                      <Uom />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
+            {
               path: 'trip',
               children: [
                 {
@@ -126,159 +254,7 @@ const MainRoutes = {
                   allowedRoles={['super_admin', 'admin']}
                   allowedCodes={['fuel']}
                 >
-                  <Fuels />
-                </AuthenticationRoutes>
-              ),
-            },
-            {
-              path: 'expense',
-              element: (
-                <AuthenticationRoutes
-                  allowedRoles={['super_admin', 'admin']}
-                  allowedCodes={['expense']}
-                >
-                  <Expenses />
-                </AuthenticationRoutes>
-              ),
-            },
-          ],
-        },
-        {
-          path: 'libraries',
-          children: [
-            {
-              path: 'party',
-              children: [
-                {
-                  path: 'active-party',
-                  element: (
-                    <AuthenticationRoutes
-                      allowedRoles={['super_admin', 'admin']}
-                      allowedCodes={['active-party']}
-                    >
-                      <ActiveParty />
-                    </AuthenticationRoutes>
-                  ),
-                },
-                {
-                  path: 'inactive-party',
-                  element: (
-                    <AuthenticationRoutes
-                      allowedRoles={['super_admin', 'admin']}
-                      allowedCodes={['inactive-party']}
-                    >
-                      <InactiveParty />
-                    </AuthenticationRoutes>
-                  ),
-                },
-              ],
-            },
-            {
-              path: 'vehicle',
-              children: [
-                {
-                  path: 'active-vehicle',
-                  element: (
-                    <AuthenticationRoutes
-                      allowedRoles={['super_admin', 'admin']}
-                      allowedCodes={['active-vehicle']}
-                    >
-                      <ActiveVehicle />
-                    </AuthenticationRoutes>
-                  ),
-                },
-                {
-                  path: 'inactive-vehicle',
-                  element: (
-                    <AuthenticationRoutes
-                      allowedRoles={['super_admin', 'admin']}
-                      allowedCodes={['inactive-vehicle']}
-                    >
-                      <InactiveVehicle />
-                    </AuthenticationRoutes>
-                  ),
-                },
-              ],
-            },
-            {
-              path: 'driver',
-              children: [
-                {
-                  path: 'active-driver',
-                  element: (
-                    <AuthenticationRoutes
-                      allowedRoles={['super_admin', 'admin']}
-                      allowedCodes={['active-driver']}
-                    >
-                      <ActiveDriver />
-                    </AuthenticationRoutes>
-                  ),
-                },
-                {
-                  path: 'inactive-driver',
-                  element: (
-                    <AuthenticationRoutes
-                      allowedRoles={['super_admin', 'admin']}
-                      allowedCodes={['inactive-driver']}
-                    >
-                      <InactiveDriver />
-                    </AuthenticationRoutes>
-                  ),
-                },
-              ],
-            },
-            {
-              path: 'expense-head',
-              element: (
-                <AuthenticationRoutes
-                  allowedRoles={['super_admin', 'admin']}
-                  allowedCodes={['expense-head']}
-                >
-                  <ExpenseHead />
-                </AuthenticationRoutes>
-              ),
-            },
-            {
-              path: 'vehicle-brand',
-              element: (
-                <AuthenticationRoutes
-                  allowedRoles={['super_admin', 'admin']}
-                  allowedCodes={['vehicle-brand']}
-                >
-                  <VehicleBrand />
-                </AuthenticationRoutes>
-              ),
-            },
-            {
-              path: 'vehicle-model',
-              element: (
-                <AuthenticationRoutes
-                  allowedRoles={['super_admin', 'admin']}
-                  allowedCodes={['vehicle-model']}
-                >
-                  <VehicleModel />
-                </AuthenticationRoutes>
-              ),
-            },
-            {
-              path: 'uom',
-              element: (
-                <AuthenticationRoutes
-                  allowedRoles={['super_admin', 'admin']}
-                  allowedCodes={['uom']}
-                >
-                  <Uom />
-                </AuthenticationRoutes>
-              ),
-            },
-            {
-              path: 'fuel-type',
-              element: (
-                <AuthenticationRoutes
-                  allowedRoles={['super_admin', 'admin']}
-                  allowedCodes={['fuel-type']}
-                >
-                  <FuelType />
+                  <FuelLogs />
                 </AuthenticationRoutes>
               ),
             },

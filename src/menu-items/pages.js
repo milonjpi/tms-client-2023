@@ -1,8 +1,12 @@
 // assets
 import {
   IconTruckDelivery,
+  IconTruck,
+  IconUsers,
+  IconMoneybag,
   IconGasStation,
   IconTool,
+  IconTrolley,
   IconCashOff,
   IconFileCertificate,
   IconReport,
@@ -11,8 +15,12 @@ import {
 // constant
 const icons = {
   IconTruckDelivery,
+  IconTruck,
+  IconUsers,
+  IconMoneybag,
   IconGasStation,
   IconTool,
+  IconTrolley,
   IconCashOff,
   IconFileCertificate,
   IconReport,
@@ -25,6 +33,166 @@ const pages = {
   title: 'Pages',
   type: 'group',
   children: [
+    {
+      id: 'vehicle-management',
+      title: 'Vehicle Management',
+      type: 'collapse',
+      color: '#2F0F5D',
+      icon: icons.IconTruck,
+      children: [
+        {
+          id: 'brands',
+          title: 'Brands',
+          type: 'item',
+          url: '/pages/vehicle-management/brands',
+        },
+        {
+          id: 'models',
+          title: 'Models',
+          type: 'item',
+          url: '/pages/vehicle-management/models',
+        },
+        {
+          id: 'vehicles',
+          title: 'Vehicles',
+          type: 'item',
+          url: '/pages/vehicle-management/vehicles',
+        },
+      ],
+    },
+    {
+      id: 'driver-management',
+      title: 'Driver Management',
+      type: 'collapse',
+      color: '#2F0F5D',
+      icon: icons.IconUsers,
+      children: [
+        {
+          id: 'drivers',
+          title: 'Drivers',
+          type: 'item',
+          url: '/pages/driver-management/drivers',
+        },
+      ],
+    },
+    {
+      id: 'trip-management',
+      title: 'Trip Management',
+      type: 'collapse',
+      color: '#2F0F5D',
+      icon: icons.IconTruckDelivery,
+      children: [
+        {
+          id: 'parties',
+          title: 'Parties',
+          type: 'item',
+          url: '/pages/trip-management/parties',
+        },
+        {
+          id: 'trip-expense',
+          title: 'Trip Expenses',
+          type: 'item',
+          url: '/pages/trip-management/trip-expense',
+        },
+        {
+          id: 'all-trips',
+          title: 'All Trips',
+          type: 'item',
+          url: '/pages/trip-management/all-trips',
+        },
+      ],
+    },
+    {
+      id: 'financial',
+      title: 'Financial',
+      type: 'collapse',
+      color: '#2F0F5D',
+      icon: icons.IconMoneybag,
+      children: [
+        {
+          id: 'account-heads',
+          title: 'Account Heads',
+          type: 'item',
+          url: '/pages/financial/account-heads',
+        },
+      ],
+    },
+    {
+      id: 'fuel-management',
+      title: 'Fuel Management',
+      type: 'collapse',
+      color: '#2F0F5D',
+      icon: icons.IconGasStation,
+      children: [
+        {
+          id: 'fuel-types',
+          title: 'Fuel Types',
+          type: 'item',
+          url: '/pages/fuel-management/fuel-types',
+        },
+        {
+          id: 'pump-station',
+          title: 'Pump Station',
+          type: 'item',
+          url: '/pages/fuel-management/pump-station',
+        },
+        {
+          id: 'fuel-logs',
+          title: 'Fuel Logs',
+          type: 'item',
+          url: '/pages/fuel-management/fuel-logs',
+        },
+      ],
+    },
+    {
+      id: 'maintenance',
+      title: 'Maintenance',
+      type: 'item',
+      color: '#2F0F5D',
+      icon: icons.IconTool,
+      url: '/pages/maintenance',
+      children: [
+        {
+          id: 'create-maintenance',
+          title: 'Create Maintenance',
+          type: 'item',
+          url: '/pages/maintenance/create-maintenance',
+        },
+        {
+          id: 'update-maintenance',
+          title: 'Update Maintenance',
+          type: 'item',
+          url: '/pages/maintenance/update-maintenance',
+        },
+      ],
+    },
+    {
+      id: 'store-management',
+      title: 'Store Management',
+      type: 'collapse',
+      color: '#2F0F5D',
+      icon: icons.IconTrolley,
+      children: [
+        {
+          id: 'equipment',
+          title: 'Equipment',
+          type: 'item',
+          url: '/pages/store-management/equipment',
+        },
+        {
+          id: 'equipment-title',
+          title: 'Equipment Title',
+          type: 'item',
+          url: '/pages/store-management/equipment-title',
+        },
+        {
+          id: 'uom',
+          title: 'Unit of Measurement',
+          type: 'item',
+          url: '/pages/store-management/uom',
+        },
+      ],
+    },
     {
       id: 'trip',
       title: 'The Trip',

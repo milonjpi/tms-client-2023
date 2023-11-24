@@ -16,10 +16,10 @@ const expenseHeadApi = api.injectEndpoints({
 
     // get expense heads
     getExpenseHeads: build.query({
-      query: (arg) => ({
+      query: (params) => ({
         url: EXPENSE_HEAD_URL,
         method: 'GET',
-        params: arg,
+        params: params,
       }),
       transformResponse: (response) => {
         return {
@@ -39,15 +39,6 @@ const expenseHeadApi = api.injectEndpoints({
       }),
       invalidatesTags: ['expense-head'],
     }),
-
-    // delete expense head
-    deleteExpenseHead: build.mutation({
-      query: (id) => ({
-        url: `${EXPENSE_HEAD_URL}/${id}`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: ['expense-head'],
-    }),
   }),
 });
 
@@ -55,5 +46,4 @@ export const {
   useCreateExpenseHeadMutation,
   useGetExpenseHeadsQuery,
   useUpdateExpenseHeadMutation,
-  useDeleteExpenseHeadMutation,
 } = expenseHeadApi;
