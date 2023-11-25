@@ -87,7 +87,7 @@ const CreateTrip = () => {
 
   const onSubmit = async (data) => {
     const newData = {
-      ...data,
+      data: {},
       startDate,
       endDate,
       distance: data.distance || 0,
