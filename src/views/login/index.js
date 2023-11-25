@@ -161,6 +161,7 @@ const Login = () => {
                         </InputLabel>
                         <OutlinedInput
                           id="outlined-adornment-email-login"
+                          defaultValue="admin"
                           label="User Name"
                           {...register('userName')}
                         />
@@ -176,6 +177,7 @@ const Login = () => {
                         </InputLabel>
                         <OutlinedInput
                           id="outlined-adornment-password-login"
+                          defaultValue="123456"
                           type={showPassword ? 'text' : 'password'}
                           endAdornment={
                             <InputAdornment position="end">
