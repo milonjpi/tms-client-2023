@@ -13,38 +13,33 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
-import { useUpdateDriverMutation } from 'store/api/driver/driverApi';
+import { useUpdateExpenseHeadMutation } from 'store/api/expenseHead/expenseHeadApi';
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: 300, sm: 500 },
+  width: { xs: 300, sm: 450 },
   maxHeight: '100vh',
   overflow: 'auto',
   boxShadow: 24,
   p: 2,
 };
 
-const UpdateDriver = ({ open, handleClose, preData }) => {
+const UpdateTripExpenseHead = ({ open, handleClose, preData }) => {
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm({ defaultValues: preData });
 
   const dispatch = useDispatch();
 
-  const [updateDriver] = useUpdateDriverMutation();
+  const [updateExpenseHead] = useUpdateExpenseHeadMutation();
   const onSubmit = async (data) => {
-    const newData = {
-      name: data?.name,
-      mobile: data?.mobile,
-      address: data?.address,
-    };
     try {
       setLoading(true);
-      const res = await updateDriver({
+      const res = await updateExpenseHead({
         id: preData?.id,
-        body: newData,
+        body: { label: data?.label },
       }).unwrap();
       if (res.success) {
         handleClose();
@@ -80,7 +75,7 @@ const UpdateDriver = ({ open, handleClose, preData }) => {
           }}
         >
           <Typography sx={{ fontSize: 16, color: '#878781' }}>
-            Edit Driver
+            Edit Expense Head
           </Typography>
           <IconButton
             color="error"
@@ -97,33 +92,16 @@ const UpdateDriver = ({ open, handleClose, preData }) => {
           onSubmit={handleSubmit(onSubmit)}
         >
           <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                required
-                label="Driver Name"
-                size="small"
-                {...register('name', { required: true })}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                required
-                label="Mobile No"
-                size="small"
-                {...register('mobile', { required: true })}
-              />
-            </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
                 required
-                label="Address"
+                label="Trip Expense Head"
                 size="small"
-                {...register('address', { required: true })}
+                {...register('label', { required: true })}
               />
             </Grid>
+
             <Grid item xs={12}>
               <LoadingButton
                 fullWidth
@@ -145,4 +123,4 @@ const UpdateDriver = ({ open, handleClose, preData }) => {
   );
 };
 
-export default UpdateDriver;
+export default UpdateTripExpenseHead;

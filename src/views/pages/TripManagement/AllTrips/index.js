@@ -17,11 +17,13 @@ import NewTrip from './NewTrip';
 import AllTripRow from './AllTripRow';
 import { useTripsQuery } from 'store/api/trip/tripApi';
 import { useDebounced } from 'hooks';
+import { useNavigate } from 'react-router-dom';
 
 const AllTrips = () => {
   const [searchText, setSearchText] = useState('');
 
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   // pagination
   const [page, setPage] = useState(0);
@@ -68,7 +70,7 @@ const AllTrips = () => {
       secondary={
         <CardAction
           title="Add Trip"
-          onClick={() => setOpen(true)}
+          onClick={() => navigate('create')}
           icon={<IconPlus />}
         />
       }

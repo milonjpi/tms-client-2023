@@ -32,8 +32,22 @@ const Drivers = Loadable(
 const Parties = Loadable(
   lazy(() => import('views/pages/TripManagement/Parties'))
 );
+const TripIncomeHeads = Loadable(
+  lazy(() => import('views/pages/TripManagement/TripIncomeHeads'))
+);
+const TripExpenseHeads = Loadable(
+  lazy(() => import('views/pages/TripManagement/TripExpenseHeads'))
+);
 const AllTrips = Loadable(
   lazy(() => import('views/pages/TripManagement/AllTrips'))
+);
+const CreateTrip = Loadable(
+  lazy(() => import('views/pages/TripManagement/AllTrips/CreateTrip'))
+);
+
+// financial management
+const AccountHeads = Loadable(
+  lazy(() => import('views/pages/FinancialManagement/AccountHeads'))
 );
 
 // fuel management
@@ -165,13 +179,67 @@ const MainRoutes = {
                   ),
                 },
                 {
-                  path: 'all-trips',
+                  path: 'trip-income-heads',
                   element: (
                     <AuthenticationRoutes
                       allowedRoles={['super_admin', 'admin']}
-                      allowedCodes={['all-trips']}
+                      allowedCodes={['trip-income-heads']}
                     >
-                      <AllTrips />
+                      <TripIncomeHeads />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'trip-expense-heads',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['trip-expense-heads']}
+                    >
+                      <TripExpenseHeads />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'all-trips',
+                  children: [
+                    {
+                      path: '',
+                      element: (
+                        <AuthenticationRoutes
+                          allowedRoles={['super_admin', 'admin']}
+                          allowedCodes={['all-trips']}
+                        >
+                          <AllTrips />
+                        </AuthenticationRoutes>
+                      ),
+                    },
+                    {
+                      path: 'create',
+                      element: (
+                        <AuthenticationRoutes
+                          allowedRoles={['super_admin', 'admin']}
+                          allowedCodes={['all-trips']}
+                        >
+                          <CreateTrip />
+                        </AuthenticationRoutes>
+                      ),
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              path: 'financial',
+              children: [
+                {
+                  path: 'account-heads',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['account-heads']}
+                    >
+                      <AccountHeads />
                     </AuthenticationRoutes>
                   ),
                 },

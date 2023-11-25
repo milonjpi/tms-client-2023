@@ -3,6 +3,8 @@ import Modal from '@mui/material/Modal';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Tooltip from '@mui/material/Tooltip';
+import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -10,6 +12,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
+import AddIcon from '@mui/icons-material/Add';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
@@ -19,6 +22,9 @@ import { useBrandsQuery } from 'store/api/brand/brandApi';
 import { useModelsQuery } from 'store/api/model/modelApi';
 import { useDriversQuery } from 'store/api/driver/driverApi';
 import { useUpdateVehicleMutation } from 'store/api/vehicle/vehicleApi';
+import AddVehicleBrand from '../VehicleBrand/AddVehicleBrand';
+import AddVehicleModel from '../VehicleModel/AddVehicleModel';
+import AddDriver from 'views/pages/DriverManagement/Drivers/AddDriver';
 
 const style = {
   position: 'absolute',
@@ -36,6 +42,10 @@ const UpdateVehicle = ({ open, handleClose, preData }) => {
   const [driver, setDriver] = useState(preData?.driver || null);
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm({ defaultValues: preData });
+
+  const [brandOpen, setBrandOpen] = useState(false);
+  const [modelOpen, setModelOpen] = useState(false);
+  const [driverOpen, setDriverOpen] = useState(false);
 
   // library
   const { data: brandData } = useBrandsQuery('', {
@@ -117,6 +127,17 @@ const UpdateVehicle = ({ open, handleClose, preData }) => {
           </IconButton>
         </Box>
         <Divider sx={{ mb: 2 }} />
+        {/* popup items */}
+        <AddVehicleBrand
+          open={brandOpen}
+          handleClose={() => setBrandOpen(false)}
+        />
+        <AddVehicleModel
+          open={modelOpen}
+          handleClose={() => setModelOpen(false)}
+        />
+        <AddDriver open={driverOpen} handleClose={() => setDriverOpen(false)} />
+        {/* end popup items */}
         <Box
           component="form"
           autoComplete="off"
@@ -133,22 +154,48 @@ const UpdateVehicle = ({ open, handleClose, preData }) => {
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <UncontrolledAutoComplete
-                defaultValue={preData?.brand || null}
-                options={allBrands?.map((el) => el.label)}
-                label="Select Brand"
-                required
-                register={{ ...register('brand', { required: true }) }}
-              />
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <UncontrolledAutoComplete
+                  defaultValue={preData?.brand || null}
+                  options={allBrands?.map((el) => el.label)}
+                  label="Select Brand"
+                  required
+                  register={{ ...register('brand', { required: true }) }}
+                />
+                <Tooltip title="Add Brand">
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    sx={{ minWidth: 0, height: 32, width: 38, ml: 1, p: 0 }}
+                    onClick={() => setBrandOpen(true)}
+                  >
+                    <AddIcon fontSize="small" />
+                  </Button>
+                </Tooltip>
+              </Box>
             </Grid>
             <Grid item xs={12} md={6}>
-              <UncontrolledAutoComplete
-                defaultValue={preData?.model || null}
-                options={allModels?.map((el) => el.label)}
-                label="Select Model"
-                required
-                register={{ ...register('model', { required: true }) }}
-              />
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <UncontrolledAutoComplete
+                  defaultValue={preData?.model || null}
+                  options={allModels?.map((el) => el.label)}
+                  label="Select Model"
+                  required
+                  register={{ ...register('model', { required: true }) }}
+                />
+                <Tooltip title="Add Model">
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    sx={{ minWidth: 0, height: 32, width: 38, ml: 1, p: 0 }}
+                    onClick={() => setModelOpen(true)}
+                  >
+                    <AddIcon fontSize="small" />
+                  </Button>
+                </Tooltip>
+              </Box>
             </Grid>
             <Grid item xs={12} md={5}>
               <TextField
@@ -162,16 +209,29 @@ const UpdateVehicle = ({ open, handleClose, preData }) => {
               />
             </Grid>
             <Grid item xs={12} md={7}>
-              <ControlledAutoComplete
-                label="Select Driver"
-                value={driver}
-                options={allDrivers}
-                getOptionLabel={(option) =>
-                  option.driverId + ', ' + option.name
-                }
-                isOptionEqualToValue={(item, value) => item.id === value.id}
-                onChange={(e, newValue) => setDriver(newValue)}
-              />
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <ControlledAutoComplete
+                  label="Select Driver"
+                  value={driver}
+                  options={allDrivers}
+                  getOptionLabel={(option) =>
+                    option.driverId + ', ' + option.name
+                  }
+                  isOptionEqualToValue={(item, value) => item.id === value.id}
+                  onChange={(e, newValue) => setDriver(newValue)}
+                />
+                <Tooltip title="Add Driver">
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    sx={{ minWidth: 0, height: 32, width: 38, ml: 1, p: 0 }}
+                    onClick={() => setDriverOpen(true)}
+                  >
+                    <AddIcon fontSize="small" />
+                  </Button>
+                </Tooltip>
+              </Box>
             </Grid>
             <Grid item xs={12}>
               <LoadingButton

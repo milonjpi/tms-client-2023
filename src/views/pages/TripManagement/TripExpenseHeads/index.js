@@ -7,24 +7,20 @@ import TableBody from '@mui/material/TableBody';
 import TableHead from '@mui/material/TableHead';
 import InputBase from '@mui/material/InputBase';
 import InputAdornment from '@mui/material/InputAdornment';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import LinearProgress from '@mui/material/LinearProgress';
 import SearchIcon from '@mui/icons-material/Search';
 import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import VehicleRow from './VehicleRow';
-import AddVehicle from './AddVehicle';
 import { useDebounced } from 'hooks';
-import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
+import { useGetAccountHeadsQuery } from 'store/api/accountHead/accountHeadApi';
+import { useGetExpenseHeadsQuery } from 'store/api/expenseHead/expenseHeadApi';
+import TripExpenseHeadRow from './TripExpenseHeadRow';
+import AddTripExpenseHead from './AddTripExpenseHead';
 
-const Vehicles = () => {
+const TripExpenseHeads = () => {
   const [searchText, setSearchText] = useState('');
-  const [status, setStatus] = useState(true);
 
   const [open, setOpen] = useState(false);
 
@@ -43,11 +39,21 @@ const Vehicles = () => {
   // end pagination
 
   // filtering and pagination
+  const { data: accountHeads } = useGetAccountHeadsQuery(
+    { limit: 100 },
+    { refetchOnMountOrArgChange: true }
+  );
+
+  const allAccountHeads = accountHeads?.accountHeads || [];
+  const findHead =
+    allAccountHeads?.find((el) => el.label === 'Trip Expense') || null;
   const query = {};
 
   query['limit'] = rowsPerPage;
   query['page'] = page;
-  query['isActive'] = status;
+  query['sortBy'] = 'label';
+  query['sortOrder'] = 'asc';
+  query['accountHeadId'] = findHead?.id;
 
   // search term
   const debouncedSearchTerm = useDebounced({
@@ -59,21 +65,21 @@ const Vehicles = () => {
     query['searchTerm'] = debouncedSearchTerm;
   }
 
-  const { data, isLoading } = useVehiclesQuery(
+  const { data, isLoading } = useGetExpenseHeadsQuery(
     { ...query },
     { refetchOnMountOrArgChange: true }
   );
 
-  const allVehicles = data?.vehicles || [];
+  const allTripExpenseHeads = data?.expenseHeads || [];
   const meta = data?.meta;
 
   let sn = page * rowsPerPage + 1;
   return (
     <MainCard
-      title="Vehicles"
+      title="Trip Expense Heads"
       secondary={
         <CardAction
-          title="Add Vehicle"
+          title="Add Head"
           onClick={() => setOpen(true)}
           icon={<IconPlus />}
         />
@@ -95,43 +101,29 @@ const Vehicles = () => {
               }
             />
           </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="vehicle-status">Status</InputLabel>
-              <Select
-                labelId="vehicle-status"
-                value={status}
-                label="Status"
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                <MenuItem value={true}>Active</MenuItem>
-                <MenuItem value={false}>Inactive</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
         </Grid>
       </Box>
       {/* popup items */}
 
-      <AddVehicle open={open} handleClose={() => setOpen(false)} />
+      <AddTripExpenseHead
+        open={open}
+        handleClose={() => setOpen(false)}
+        accountHeadId={findHead?.id}
+      />
       {/* end popup items */}
       <Box sx={{ overflow: 'auto' }}>
         <Table sx={{ minWidth: 400 }}>
           <TableHead>
             <StyledTableRow>
               <StyledTableCell align="center">SN</StyledTableCell>
-              <StyledTableCell>Vehicle Id</StyledTableCell>
-              <StyledTableCell>Reg. No</StyledTableCell>
-              <StyledTableCell>Model</StyledTableCell>
-              <StyledTableCell>Value</StyledTableCell>
-              <StyledTableCell>Assigned Driver</StyledTableCell>
+              <StyledTableCell>Expense Head</StyledTableCell>
               <StyledTableCell align="center">Action</StyledTableCell>
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {allVehicles?.length ? (
-              allVehicles.map((item) => (
-                <VehicleRow key={item.id} sn={sn++} data={item} />
+            {allTripExpenseHeads?.length ? (
+              allTripExpenseHeads.map((item) => (
+                <TripExpenseHeadRow key={item.id} sn={sn++} data={item} />
               ))
             ) : (
               <StyledTableRow>
@@ -160,4 +152,4 @@ const Vehicles = () => {
   );
 };
 
-export default Vehicles;
+export default TripExpenseHeads;

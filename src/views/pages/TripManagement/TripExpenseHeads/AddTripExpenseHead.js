@@ -13,42 +13,39 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
-import { useUpdateDriverMutation } from 'store/api/driver/driverApi';
+import { useCreateExpenseHeadMutation } from 'store/api/expenseHead/expenseHeadApi';
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: 300, sm: 500 },
+  width: { xs: 300, sm: 450 },
   maxHeight: '100vh',
   overflow: 'auto',
   boxShadow: 24,
   p: 2,
 };
 
-const UpdateDriver = ({ open, handleClose, preData }) => {
+const AddTripExpenseHead = ({ open, handleClose, accountHeadId }) => {
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit } = useForm({ defaultValues: preData });
+  const { register, handleSubmit, reset } = useForm();
 
   const dispatch = useDispatch();
 
-  const [updateDriver] = useUpdateDriverMutation();
+  const [createExpenseHead] = useCreateExpenseHeadMutation();
   const onSubmit = async (data) => {
     const newData = {
-      name: data?.name,
-      mobile: data?.mobile,
-      address: data?.address,
+      label: data?.label,
+      accountHeadId,
     };
     try {
       setLoading(true);
-      const res = await updateDriver({
-        id: preData?.id,
-        body: newData,
-      }).unwrap();
+      const res = await createExpenseHead({ ...newData }).unwrap();
       if (res.success) {
         handleClose();
         setLoading(false);
+        reset();
         dispatch(
           setToast({
             open: true,
@@ -80,7 +77,7 @@ const UpdateDriver = ({ open, handleClose, preData }) => {
           }}
         >
           <Typography sx={{ fontSize: 16, color: '#878781' }}>
-            Edit Driver
+            Add Expense Head
           </Typography>
           <IconButton
             color="error"
@@ -97,33 +94,16 @@ const UpdateDriver = ({ open, handleClose, preData }) => {
           onSubmit={handleSubmit(onSubmit)}
         >
           <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                required
-                label="Driver Name"
-                size="small"
-                {...register('name', { required: true })}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                required
-                label="Mobile No"
-                size="small"
-                {...register('mobile', { required: true })}
-              />
-            </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
                 required
-                label="Address"
+                label="Trip Expense Head"
                 size="small"
-                {...register('address', { required: true })}
+                {...register('label', { required: true })}
               />
             </Grid>
+
             <Grid item xs={12}>
               <LoadingButton
                 fullWidth
@@ -135,7 +115,7 @@ const UpdateDriver = ({ open, handleClose, preData }) => {
                 variant="contained"
                 type="submit"
               >
-                Update
+                Submit
               </LoadingButton>
             </Grid>
           </Grid>
@@ -145,4 +125,4 @@ const UpdateDriver = ({ open, handleClose, preData }) => {
   );
 };
 
-export default UpdateDriver;
+export default AddTripExpenseHead;

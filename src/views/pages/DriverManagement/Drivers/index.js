@@ -7,6 +7,10 @@ import TableBody from '@mui/material/TableBody';
 import TableHead from '@mui/material/TableHead';
 import InputBase from '@mui/material/InputBase';
 import InputAdornment from '@mui/material/InputAdornment';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 import LinearProgress from '@mui/material/LinearProgress';
 import SearchIcon from '@mui/icons-material/Search';
 import MainCard from 'ui-component/cards/MainCard';
@@ -20,6 +24,7 @@ import { useDriversQuery } from 'store/api/driver/driverApi';
 
 const Drivers = () => {
   const [searchText, setSearchText] = useState('');
+  const [status, setStatus] = useState(true);
 
   const [open, setOpen] = useState(false);
 
@@ -42,7 +47,7 @@ const Drivers = () => {
 
   query['limit'] = rowsPerPage;
   query['page'] = page;
-  query['isActive'] = true;
+  query['isActive'] = status;
 
   // search term
   const debouncedSearchTerm = useDebounced({
@@ -76,7 +81,7 @@ const Drivers = () => {
     >
       <Box sx={{ mb: 2 }}>
         <Grid container spacing={2} sx={{ alignItems: 'end' }}>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={5}>
             <InputBase
               fullWidth
               placeholder="Search..."
@@ -89,6 +94,20 @@ const Drivers = () => {
                 </InputAdornment>
               }
             />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="driver-status">Status</InputLabel>
+              <Select
+                labelId="driver-status"
+                value={status}
+                label="Status"
+                onChange={(e) => setStatus(e.target.value)}
+              >
+                <MenuItem value={true}>Active</MenuItem>
+                <MenuItem value={false}>Inactive</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
         </Grid>
       </Box>

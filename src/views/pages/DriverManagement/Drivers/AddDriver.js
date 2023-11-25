@@ -89,8 +89,8 @@ const AddDriver = ({ open, handleClose }) => {
           autoComplete="off"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 required
@@ -99,7 +99,7 @@ const AddDriver = ({ open, handleClose }) => {
                 {...register('name', { required: true })}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 required

@@ -89,10 +89,16 @@ const pages = {
           url: '/pages/trip-management/parties',
         },
         {
-          id: 'trip-expense',
-          title: 'Trip Expenses',
+          id: 'trip-income-heads',
+          title: 'Trip Income Heads',
           type: 'item',
-          url: '/pages/trip-management/trip-expense',
+          url: '/pages/trip-management/trip-income-heads',
+        },
+        {
+          id: 'trip-expense-heads',
+          title: 'Trip Expense Heads',
+          type: 'item',
+          url: '/pages/trip-management/trip-expense-heads',
         },
         {
           id: 'all-trips',

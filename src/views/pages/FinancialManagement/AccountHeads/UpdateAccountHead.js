@@ -4,6 +4,8 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Divider from '@mui/material/Divider';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -13,7 +15,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
-import { useUpdateDriverMutation } from 'store/api/driver/driverApi';
+import { useUpdateAccountHeadMutation } from 'store/api/accountHead/accountHeadApi';
 
 const style = {
   position: 'absolute',
@@ -27,22 +29,21 @@ const style = {
   p: 2,
 };
 
-const UpdateDriver = ({ open, handleClose, preData }) => {
+const UpdateAccountHead = ({ open, handleClose, preData }) => {
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm({ defaultValues: preData });
 
   const dispatch = useDispatch();
 
-  const [updateDriver] = useUpdateDriverMutation();
+  const [updateAccountHead] = useUpdateAccountHeadMutation();
   const onSubmit = async (data) => {
     const newData = {
-      name: data?.name,
-      mobile: data?.mobile,
-      address: data?.address,
+      label: data?.label,
+      isIncome: data?.isIncome,
     };
     try {
       setLoading(true);
-      const res = await updateDriver({
+      const res = await updateAccountHead({
         id: preData?.id,
         body: newData,
       }).unwrap();
@@ -80,7 +81,7 @@ const UpdateDriver = ({ open, handleClose, preData }) => {
           }}
         >
           <Typography sx={{ fontSize: 16, color: '#878781' }}>
-            Edit Driver
+            Edit Account Head
           </Typography>
           <IconButton
             color="error"
@@ -101,27 +102,16 @@ const UpdateDriver = ({ open, handleClose, preData }) => {
               <TextField
                 fullWidth
                 required
-                label="Driver Name"
+                label="Account Head"
                 size="small"
-                {...register('name', { required: true })}
+                {...register('label', { required: true })}
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
+              <FormControlLabel
                 required
-                label="Mobile No"
-                size="small"
-                {...register('mobile', { required: true })}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                required
-                label="Address"
-                size="small"
-                {...register('address', { required: true })}
+                control={<Checkbox {...register('isIncome')} />}
+                label="Is Income"
               />
             </Grid>
             <Grid item xs={12}>
@@ -145,4 +135,4 @@ const UpdateDriver = ({ open, handleClose, preData }) => {
   );
 };
 
-export default UpdateDriver;
+export default UpdateAccountHead;

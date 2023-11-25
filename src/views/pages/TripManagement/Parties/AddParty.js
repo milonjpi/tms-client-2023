@@ -89,8 +89,8 @@ const AddParty = ({ open, handleClose }) => {
           autoComplete="off"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 required
@@ -99,22 +99,20 @@ const AddParty = ({ open, handleClose }) => {
                 {...register('name', { required: true })}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                required
                 label="Mobile No"
                 size="small"
-                {...register('mobile', { required: true })}
+                {...register('mobile')}
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                required
                 label="Address"
                 size="small"
-                {...register('address', { required: true })}
+                {...register('address')}
               />
             </Grid>
             <Grid item xs={12}>
