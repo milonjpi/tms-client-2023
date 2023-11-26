@@ -99,6 +99,7 @@ const AllTrips = () => {
               <StyledTableCell>Trip Id</StyledTableCell>
               <StyledTableCell>Vehicle</StyledTableCell>
               <StyledTableCell>Date</StyledTableCell>
+              <StyledTableCell>Party</StyledTableCell>
               <StyledTableCell>Destination</StyledTableCell>
               <StyledTableCell align="right">
                 Distance &#40;KM&#41;

@@ -55,10 +55,10 @@ const TripInvoice = ({ open, handleClose, data }) => {
     `,
   });
 
-  const expenseData = data?.tripExpenses || [];
+  const allExpenseData = data?.expenses || [];
+  const expenseData = allExpenseData?.filter((el) => el.amount);
   const tripValue = data?.tripValue || 0;
-  const tripExpenses = data?.tripExpenses || [];
-  const totalExpenses = totalSum(tripExpenses, 'amount');
+  const totalExpenses = totalSum(expenseData, 'amount');
 
   const netProfit = tripValue - totalExpenses;
 
@@ -137,7 +137,7 @@ const TripInvoice = ({ open, handleClose, data }) => {
                       Invoice Date:
                     </Typography>
                     <Typography sx={{ fontSize: 11 }}>
-                      {moment(data?.createdAt).format('DD/MM/YYYY')}
+                      {moment(data?.startDate).format('DD/MM/YYYY')}
                     </Typography>
                   </Box>
                   <Box sx={{ mb: 1 }}>
@@ -218,7 +218,7 @@ const TripInvoice = ({ open, handleClose, data }) => {
                         component="span"
                         sx={{ fontSize: 16, lineHeight: 1, fontWeight: 700 }}
                       >
-                        Payment Info
+                        Trip Summary
                       </Typography>
                     }
                   >

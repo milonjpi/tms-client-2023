@@ -61,6 +61,7 @@ const AllTripRow = ({ sn, data }) => {
       <StyledTableCell>
         {moment(data?.startDate).format('DD/MM/YYYY')}
       </StyledTableCell>
+      <StyledTableCell>{data?.party?.name}</StyledTableCell>
       <StyledTableCell>{data?.from + ' to ' + data?.to}</StyledTableCell>
       <StyledTableCell align="right">{data?.distance}</StyledTableCell>
       <StyledTableCell align="right">{data?.tripValue}</StyledTableCell>
