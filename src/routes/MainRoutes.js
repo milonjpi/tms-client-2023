@@ -44,6 +44,9 @@ const AllTrips = Loadable(
 const CreateTrip = Loadable(
   lazy(() => import('views/pages/TripManagement/AllTrips/CreateTrip'))
 );
+const UpdateTrip = Loadable(
+  lazy(() => import('views/pages/TripManagement/AllTrips/UpdateTrip'))
+);
 
 // financial management
 const AccountHeads = Loadable(
@@ -222,6 +225,17 @@ const MainRoutes = {
                           allowedCodes={['all-trips']}
                         >
                           <CreateTrip />
+                        </AuthenticationRoutes>
+                      ),
+                    },
+                    {
+                      path: 'edit/:id',
+                      element: (
+                        <AuthenticationRoutes
+                          allowedRoles={['super_admin', 'admin']}
+                          allowedCodes={['all-trips']}
+                        >
+                          <UpdateTrip />
                         </AuthenticationRoutes>
                       ),
                     },

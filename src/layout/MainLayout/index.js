@@ -35,16 +35,16 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
-      [theme.breakpoints.up('md')]: {
+      [theme.breakpoints.up('lg')]: {
         marginLeft: -(drawerWidth - 20),
         width: `calc(100% - ${drawerWidth}px)`,
       },
-      [theme.breakpoints.down('md')]: {
+      [theme.breakpoints.down('lg')]: {
         marginLeft: '20px',
         width: `calc(100% - ${drawerWidth}px)`,
         padding: '16px',
       },
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         marginLeft: '10px',
         width: `calc(100% - ${drawerWidth}px)`,
         padding: '16px',
@@ -60,10 +60,10 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
       borderBottomLeftRadius: 0,
       borderBottomRightRadius: 0,
       width: `calc(100% - ${drawerWidth}px)`,
-      [theme.breakpoints.down('md')]: {
+      [theme.breakpoints.down('lg')]: {
         marginLeft: '20px',
       },
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         marginLeft: '10px',
       },
     }),
@@ -74,7 +74,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
 
 const MainLayout = () => {
   const theme = useTheme();
-  const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
+  const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'));
   // Handle left drawer
   const leftDrawerOpened = useSelector((state) => state.customization.opened);
   const dispatch = useDispatch();

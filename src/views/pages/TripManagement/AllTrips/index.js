@@ -13,7 +13,6 @@ import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import NewTrip from './NewTrip';
 import AllTripRow from './AllTripRow';
 import { useTripsQuery } from 'store/api/trip/tripApi';
 import { useDebounced } from 'hooks';
@@ -22,7 +21,6 @@ import { useNavigate } from 'react-router-dom';
 const AllTrips = () => {
   const [searchText, setSearchText] = useState('');
 
-  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
   // pagination
@@ -93,10 +91,6 @@ const AllTrips = () => {
           </Grid>
         </Grid>
       </Box>
-      {/* popup items */}
-
-      <NewTrip open={open} handleClose={() => setOpen(false)} />
-      {/* end popup items */}
       <Box sx={{ overflow: 'auto' }}>
         <Table sx={{ minWidth: 400 }}>
           <TableHead>
@@ -106,8 +100,10 @@ const AllTrips = () => {
               <StyledTableCell>Vehicle</StyledTableCell>
               <StyledTableCell>Date</StyledTableCell>
               <StyledTableCell>Destination</StyledTableCell>
-              <StyledTableCell align="right">Distance</StyledTableCell>
-              <StyledTableCell align="right">Trip Value</StyledTableCell>
+              <StyledTableCell align="right">
+                Distance &#40;KM&#41;
+              </StyledTableCell>
+              <StyledTableCell align="right">Trip Fare</StyledTableCell>
               <StyledTableCell align="right">Trip Expenses</StyledTableCell>
               <StyledTableCell align="right">Net Profit</StyledTableCell>
               <StyledTableCell align="center">Invoice</StyledTableCell>

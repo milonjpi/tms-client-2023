@@ -13,7 +13,6 @@ import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import NewTrip from './NewTrip';
 import AllTripRow from './AllTripRow';
 import { useTripsQuery } from 'store/api/trip/tripApi';
 import { useDebounced } from 'hooks';
@@ -91,10 +90,6 @@ const AllTrips = () => {
           </Grid>
         </Grid>
       </Box>
-      {/* popup items */}
-
-      <NewTrip open={open} handleClose={() => setOpen(false)} />
-      {/* end popup items */}
       <Box sx={{ overflow: 'auto' }}>
         <Table sx={{ minWidth: 400 }}>
           <TableHead>

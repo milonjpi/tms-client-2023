@@ -1,6 +1,6 @@
 import axios from 'axios';
-export const BASE_ADDRESS = 'https://truck-management-backend.vercel.app';
-export const BASE_URL = 'https://truck-management-backend.vercel.app/api/v1';
+export const BASE_ADDRESS = 'http://192.168.0.244:5038';
+export const BASE_URL = 'http://192.168.0.244:5038/api/v1';
 
 const client = axios.create({
   baseURL: BASE_URL,

@@ -17,11 +17,11 @@ import { drawerWidth } from 'store/constant';
 
 const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
   const theme = useTheme();
-  const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
+  const matchUpMd = useMediaQuery(theme.breakpoints.up('lg'));
 
   const drawer = (
     <>
-      <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+      <Box sx={{ display: { xs: 'block', lg: 'none' } }}>
         <Box sx={{ display: 'flex', p: 2, mx: 'auto' }}>
           <LogoSection />
         </Box>
@@ -67,7 +67,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
             background: theme.palette.background.default,
             color: theme.palette.text.primary,
             borderRight: 'none',
-            [theme.breakpoints.up('md')]: {
+            [theme.breakpoints.up('lg')]: {
               top: '50px',
             },
           },
