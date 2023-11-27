@@ -51,7 +51,7 @@ const TripIncomeHeads = () => {
 
   query['limit'] = rowsPerPage;
   query['page'] = page;
-  query['sortBy'] = 'label';
+  query['sortBy'] = 'createdAt';
   query['sortOrder'] = 'asc';
   query['accountHeadId'] = findHead?.id;
 
