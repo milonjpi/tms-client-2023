@@ -6,22 +6,24 @@ import { useDispatch } from 'react-redux';
 import { setToast } from 'store/toastSlice';
 import ConfirmDialog from 'ui-component/ConfirmDialog';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import { useDeleteFuelMutation } from 'store/api/fuel/fuelApi';
-import UpdateFuel from './UpdateFuel';
 import moment from 'moment';
+import { useDeleteEquipmentMutation } from 'store/api/equipment/equipmentApi';
+import UpdateEquipment from './UpdateEquipment';
 
-const FuelRow = ({ sn, data }) => {
+const EquipmentRow = ({ sn, data }) => {
+  const equipmentTitle = data?.equipmentTitle;
+
   const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState(false);
 
-  const [deleteFuel] = useDeleteFuelMutation();
+  const [deleteEquipment] = useDeleteEquipmentMutation();
 
   const dispatch = useDispatch();
 
   const handleDelete = async () => {
     setDialog(false);
     try {
-      const res = await deleteFuel(data?.id).unwrap();
+      const res = await deleteEquipment(data?.id).unwrap();
       if (res.success) {
         dispatch(
           setToast({
@@ -41,22 +43,18 @@ const FuelRow = ({ sn, data }) => {
       );
     }
   };
+
   return (
     <StyledTableRow>
       <StyledTableCell align="center">{sn}</StyledTableCell>
       <StyledTableCell>
         {moment(data?.date).format('DD/MM/YYYY')}
       </StyledTableCell>
-      <StyledTableCell>{data?.vehicle?.regNo}</StyledTableCell>
-      <StyledTableCell>
-        {data?.driver ? data?.driver?.name : 'n/a'}
-      </StyledTableCell>
-      <StyledTableCell>
-        {data?.fuelPump ? data?.fuelPump?.label : 'n/a'}
-      </StyledTableCell>
-      <StyledTableCell>{data?.fuelType?.label}</StyledTableCell>
+      <StyledTableCell>{equipmentTitle?.label}</StyledTableCell>
+      <StyledTableCell>{equipmentTitle?.uom?.label}</StyledTableCell>
       <StyledTableCell align="right">{data?.quantity}</StyledTableCell>
-      <StyledTableCell align="right">{data?.amount}</StyledTableCell>
+      <StyledTableCell align="right">{data?.unitPrice}</StyledTableCell>
+      <StyledTableCell align="right">{data?.totalPrice}</StyledTableCell>
       <StyledTableCell>{data?.remarks}</StyledTableCell>
       <StyledTableCell align="center">
         <ButtonGroup>
@@ -75,20 +73,20 @@ const FuelRow = ({ sn, data }) => {
             <IconTrashXFilled size={18} />
           </IconButton>
         </ButtonGroup>
+        <UpdateEquipment
+          open={open}
+          handleClose={() => setOpen(false)}
+          preData={data}
+        />
         <ConfirmDialog
           open={dialog}
           setOpen={setDialog}
-          content="Delete Fuel"
+          content="Delete Equipment"
           handleDelete={handleDelete}
-        />
-        <UpdateFuel
-          open={open}
-          preData={data}
-          handleClose={() => setOpen(false)}
         />
       </StyledTableCell>
     </StyledTableRow>
   );
 };
 
-export default FuelRow;
+export default EquipmentRow;

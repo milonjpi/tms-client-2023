@@ -57,6 +57,9 @@ const AccountHeads = Loadable(
 const FuelTypes = Loadable(
   lazy(() => import('views/pages/FuelManagement/FuelTypes'))
 );
+const PumpStation = Loadable(
+  lazy(() => import('views/pages/FuelManagement/PumpStation'))
+);
 const FuelLogs = Loadable(
   lazy(() => import('views/pages/FuelManagement/FuelLogs'))
 );
@@ -66,6 +69,12 @@ const TripExpense = Loadable(
 );
 
 // store management
+const Equipment = Loadable(
+  lazy(() => import('views/pages/StoreManagement/Equipment'))
+);
+const EquipmentTitle = Loadable(
+  lazy(() => import('views/pages/StoreManagement/EquipmentTitle'))
+);
 const Uom = Loadable(lazy(() => import('views/pages/StoreManagement/Uom')));
 
 // utilities routing
@@ -274,6 +283,17 @@ const MainRoutes = {
                   ),
                 },
                 {
+                  path: 'pump-station',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['pump-station']}
+                    >
+                      <PumpStation />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
                   path: 'fuel-logs',
                   element: (
                     <AuthenticationRoutes
@@ -289,6 +309,28 @@ const MainRoutes = {
             {
               path: 'store-management',
               children: [
+                {
+                  path: 'equipment',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['equipment']}
+                    >
+                      <Equipment />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'equipment-title',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['equipment-title']}
+                    >
+                      <EquipmentTitle />
+                    </AuthenticationRoutes>
+                  ),
+                },
                 {
                   path: 'uom',
                   element: (

@@ -153,22 +153,21 @@ const pages = {
     {
       id: 'maintenance',
       title: 'Maintenance',
-      type: 'item',
+      type: 'collapse',
       color: '#2F0F5D',
       icon: icons.IconTool,
-      url: '/pages/maintenance',
       children: [
         {
-          id: 'create-maintenance',
-          title: 'Create Maintenance',
+          id: 'repair-maintenance',
+          title: 'Repair Maintenance',
           type: 'item',
-          url: '/pages/maintenance/create-maintenance',
+          url: '/pages/maintenance/repair-maintenance',
         },
         {
-          id: 'update-maintenance',
-          title: 'Update Maintenance',
+          id: 'accident-history',
+          title: 'Accident History',
           type: 'item',
-          url: '/pages/maintenance/update-maintenance',
+          url: '/pages/maintenance/accident-history',
         },
       ],
     },
@@ -199,35 +198,7 @@ const pages = {
         },
       ],
     },
-    {
-      id: 'trip',
-      title: 'The Trip',
-      type: 'collapse',
-      color: '#2F0F5D',
-      icon: icons.IconTruckDelivery,
-      children: [
-        {
-          id: 'all-trips',
-          title: 'All Trips',
-          type: 'item',
-          url: '/pages/trip/all-trips',
-        },
-        {
-          id: 'trip-expense',
-          title: 'Trip Expenses',
-          type: 'item',
-          url: '/pages/trip/trip-expense',
-        },
-      ],
-    },
-    {
-      id: 'fuel',
-      title: 'Fuel',
-      type: 'item',
-      color: '#2F0F5D',
-      icon: icons.IconGasStation,
-      url: '/pages/fuel',
-    },
+
     {
       id: 'expense',
       title: 'Expenses',
@@ -236,34 +207,6 @@ const pages = {
       icon: icons.IconCashOff,
       url: '/pages/expense',
     },
-    {
-      id: 'maintenance',
-      title: 'Maintenance',
-      type: 'collapse',
-      color: '#2F0F5D',
-      icon: icons.IconTool,
-      children: [
-        {
-          id: 'schedule',
-          title: 'Schedule',
-          type: 'item',
-          url: '/page/maintenance/schedule',
-        },
-        {
-          id: 'unschedule',
-          title: 'Unschedule',
-          type: 'item',
-          url: '/page/maintenance/unschedule',
-        },
-        {
-          id: 'accidental',
-          title: 'Accidental',
-          type: 'item',
-          url: '/page/maintenance/accidental',
-        },
-      ],
-    },
-
     {
       id: 'paper',
       title: 'Paper Work',

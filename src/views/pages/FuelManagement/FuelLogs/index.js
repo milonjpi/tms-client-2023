@@ -102,8 +102,9 @@ const FuelLogs = () => {
               <StyledTableCell align="center">SN</StyledTableCell>
               <StyledTableCell>Date</StyledTableCell>
               <StyledTableCell>Vehicle</StyledTableCell>
+              <StyledTableCell>Driver</StyledTableCell>
+              <StyledTableCell>Pump</StyledTableCell>
               <StyledTableCell>Fuel Type</StyledTableCell>
-              <StyledTableCell>UOM</StyledTableCell>
               <StyledTableCell align="right">Quantity</StyledTableCell>
               <StyledTableCell align="right">
                 Amount&#40;TK&#41;

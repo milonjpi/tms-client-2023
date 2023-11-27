@@ -4,8 +4,6 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Divider from '@mui/material/Divider';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -15,88 +13,61 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
-import AddIcon from '@mui/icons-material/Add';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
-import { useUpdateFuelMutation } from 'store/api/fuel/fuelApi';
-import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
-import { useFuelTypeQuery } from 'store/api/fuelType/fuelTypeApi';
+import { useGetEquipmentTitlesQuery } from 'store/api/equipmentTitle/equipmentTitleSlice';
 import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
-import { useFuelPumpsQuery } from 'store/api/fuelPump/fuelPumpApi';
-import AddPumpStation from '../PumpStation/AddPumpStation';
-import { useDriversQuery } from 'store/api/driver/driverApi';
+import { useAddEquipmentMutation } from 'store/api/equipment/equipmentApi';
+import moment from 'moment';
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: 300, sm: 500, md: 700 },
+  width: { xs: 300, sm: 450, md: 700 },
   maxHeight: '100vh',
   overflow: 'auto',
   boxShadow: 24,
   p: 2,
 };
 
-const UpdateFuel = ({ open, handleClose, preData }) => {
+const AddEquipment = ({ open, handleClose }) => {
   const [loading, setLoading] = useState(false);
-  const [date, setDate] = useState(preData?.date);
-  const [vehicle, setVehicle] = useState(preData?.vehicle || null);
-  const [driver, setDriver] = useState(preData?.driver || null);
-  const [fuelType, setFuelType] = useState(preData?.fuelType || null);
-  const [pumpStation, setPumpStation] = useState(preData?.fuelPump || null);
-  const [addPumpOpen, setAddPumpOpen] = useState(false);
-  const { register, handleSubmit } = useForm({ defaultValues: preData });
+  const [date, setDate] = useState(moment());
+  const [equipmentTitle, setEquipmentTitle] = useState(null);
+  const { register, handleSubmit, reset } = useForm();
 
   // library
-  const { data: vehicleData } = useVehiclesQuery(
-    { limit: 100, isActive: true },
+  const { data: equipmentTitlesData } = useGetEquipmentTitlesQuery(
+    { limit: 200, sortBy: 'label', sortOrder: 'asc' },
     { refetchOnMountOrArgChange: true }
   );
-  const allVehicles = vehicleData?.vehicles || [];
 
-  const { data: driverData } = useDriversQuery(
-    { limit: 100, isActive: true },
-    { refetchOnMountOrArgChange: true }
-  );
-  const allDrivers = driverData?.drivers || [];
-
-  const { data: fuelTypeData } = useFuelTypeQuery('', {
-    refetchOnMountOrArgChange: true,
-  });
-  const allFuelTypes = fuelTypeData?.data || [];
-
-  const { data: fuelPumpData } = useFuelPumpsQuery(
-    { limit: 100, sortBy: 'label', sortOrder: 'asc' },
-    {
-      refetchOnMountOrArgChange: true,
-    }
-  );
-  const allFuelPumps = fuelPumpData?.fuelPumps || [];
+  const allEquipmentTitles = equipmentTitlesData?.equipmentTitles || [];
   // end library
 
   const dispatch = useDispatch();
 
-  const [updateFuel] = useUpdateFuelMutation();
+  const [addEquipment] = useAddEquipmentMutation();
   const onSubmit = async (data) => {
     const newData = {
       date,
-      vehicleId: vehicle?.id,
-      driverId: driver?.id,
-      fuelTypeId: fuelType?.id,
-      fuelPumpId: pumpStation?.id,
-      odoMeter: data?.odoMeter,
+      equipmentTitleId: equipmentTitle?.id,
       quantity: data?.quantity,
-      amount: data?.amount,
+      unitPrice: data?.unitPrice,
+      totalPrice: data?.totalPrice,
       remarks: data?.remarks,
     };
     try {
       setLoading(true);
-      const res = await updateFuel({ id: preData?.id, body: newData }).unwrap();
+      const res = await addEquipment({ ...newData }).unwrap();
       if (res.success) {
         handleClose();
         setLoading(false);
+        reset();
+        setEquipmentTitle(null);
         dispatch(
           setToast({
             open: true,
@@ -128,7 +99,7 @@ const UpdateFuel = ({ open, handleClose, preData }) => {
           }}
         >
           <Typography sx={{ fontSize: 16, color: '#878781' }}>
-            Edit Fuel
+            Add Equipment
           </Typography>
           <IconButton
             color="error"
@@ -139,12 +110,6 @@ const UpdateFuel = ({ open, handleClose, preData }) => {
           </IconButton>
         </Box>
         <Divider sx={{ mb: 2 }} />
-        {/* popup items */}
-        <AddPumpStation
-          open={addPumpOpen}
-          handleClose={() => setAddPumpOpen(false)}
-        />
-        {/* end popup items */}
         <Box
           component="form"
           autoComplete="off"
@@ -176,72 +141,20 @@ const UpdateFuel = ({ open, handleClose, preData }) => {
             </Grid>
             <Grid item xs={12} md={8}>
               <ControlledAutoComplete
-                label="Select Vehicle"
+                label="Select Equipment"
                 required
-                value={vehicle}
-                options={allVehicles}
-                getOptionLabel={(option) =>
-                  option.vehicleId + ' - ' + option.regNo
-                }
-                isOptionEqualToValue={(item, value) => item.id === value.id}
-                onChange={(e, newValue) => setVehicle(newValue)}
-              />
-            </Grid>
-            <Grid item xs={12} md={5}>
-              <ControlledAutoComplete
-                label="Select Driver"
-                value={driver}
-                options={allDrivers}
-                getOptionLabel={(option) =>
-                  option.driverId + ', ' + option.name
-                }
-                isOptionEqualToValue={(item, value) => item.id === value.id}
-                onChange={(e, newValue) => setDriver(newValue)}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={7}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <ControlledAutoComplete
-                  label="Select Pump Station"
-                  value={pumpStation}
-                  options={allFuelPumps}
-                  getOptionLabel={(option) =>
-                    option.label +
-                    (option?.address ? ', ' + option?.address : '')
-                  }
-                  isOptionEqualToValue={(item, value) => item.id === value.id}
-                  onChange={(e, newValue) => setPumpStation(newValue)}
-                />
-                <Tooltip title="Add Pump Station">
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    size="small"
-                    sx={{ minWidth: 0, height: 32, width: 38, ml: 1, p: 0 }}
-                    onClick={() => setAddPumpOpen(true)}
-                  >
-                    <AddIcon fontSize="small" />
-                  </Button>
-                </Tooltip>
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <ControlledAutoComplete
-                label="Select Fuel Type"
-                required
-                value={fuelType}
-                options={allFuelTypes}
+                value={equipmentTitle}
+                options={allEquipmentTitles}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(item, value) => item.id === value.id}
-                onChange={(e, newValue) => setFuelType(newValue)}
+                onChange={(e, newValue) => setEquipmentTitle(newValue)}
               />
             </Grid>
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
                 required
-                label="Quantity in Litre"
+                label="Quantity"
                 size="small"
                 type="number"
                 inputProps={{
@@ -257,10 +170,13 @@ const UpdateFuel = ({ open, handleClose, preData }) => {
               <TextField
                 fullWidth
                 required
-                label="Amount (TK)"
+                label="Unit Price"
                 size="small"
                 type="number"
-                {...register('amount', {
+                inputProps={{
+                  step: '0.01',
+                }}
+                {...register('unitPrice', {
                   required: true,
                   valueAsNumber: true,
                 })}
@@ -269,13 +185,20 @@ const UpdateFuel = ({ open, handleClose, preData }) => {
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Odo Meter"
+                required
+                label="Total Price"
                 size="small"
                 type="number"
-                {...register('odoMeter', { valueAsNumber: true })}
+                inputProps={{
+                  step: '0.01',
+                }}
+                {...register('totalPrice', {
+                  required: true,
+                  valueAsNumber: true,
+                })}
               />
             </Grid>
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12}>
               <TextField
                 fullWidth
                 label="Remarks"
@@ -294,7 +217,7 @@ const UpdateFuel = ({ open, handleClose, preData }) => {
                 variant="contained"
                 type="submit"
               >
-                Update
+                Submit
               </LoadingButton>
             </Grid>
           </Grid>
@@ -304,4 +227,4 @@ const UpdateFuel = ({ open, handleClose, preData }) => {
   );
 };
 
-export default UpdateFuel;
+export default AddEquipment;

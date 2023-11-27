@@ -4,6 +4,8 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Divider from '@mui/material/Divider';
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -13,6 +15,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
+import AddIcon from '@mui/icons-material/Add';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
@@ -21,6 +24,9 @@ import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
 import { useFuelTypeQuery } from 'store/api/fuelType/fuelTypeApi';
 import moment from 'moment';
 import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
+import { useFuelPumpsQuery } from 'store/api/fuelPump/fuelPumpApi';
+import AddPumpStation from '../PumpStation/AddPumpStation';
+import { useDriversQuery } from 'store/api/driver/driverApi';
 
 const style = {
   position: 'absolute',
@@ -38,7 +44,10 @@ const AddFuel = ({ open, handleClose }) => {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(moment());
   const [vehicle, setVehicle] = useState(null);
+  const [driver, setDriver] = useState(null);
   const [fuelType, setFuelType] = useState(null);
+  const [pumpStation, setPumpStation] = useState(null);
+  const [addPumpOpen, setAddPumpOpen] = useState(false);
   const { register, handleSubmit, reset } = useForm();
 
   // library
@@ -48,10 +57,24 @@ const AddFuel = ({ open, handleClose }) => {
   );
   const allVehicles = vehicleData?.vehicles || [];
 
+  const { data: driverData } = useDriversQuery(
+    { limit: 100, isActive: true },
+    { refetchOnMountOrArgChange: true }
+  );
+  const allDrivers = driverData?.drivers || [];
+
   const { data: fuelTypeData } = useFuelTypeQuery('', {
     refetchOnMountOrArgChange: true,
   });
   const allFuelTypes = fuelTypeData?.data || [];
+
+  const { data: fuelPumpData } = useFuelPumpsQuery(
+    { limit: 100, sortBy: 'label', sortOrder: 'asc' },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
+  const allFuelPumps = fuelPumpData?.fuelPumps || [];
   // end library
 
   const dispatch = useDispatch();
@@ -61,7 +84,10 @@ const AddFuel = ({ open, handleClose }) => {
     const newData = {
       date,
       vehicleId: vehicle?.id,
+      driverId: driver?.id,
       fuelTypeId: fuelType?.id,
+      fuelPumpId: pumpStation?.id,
+      odoMeter: data?.odoMeter,
       quantity: data?.quantity,
       amount: data?.amount,
       remarks: data?.remarks,
@@ -75,6 +101,8 @@ const AddFuel = ({ open, handleClose }) => {
         reset();
         setDate(moment());
         setVehicle(null);
+        setDriver(null);
+        setPumpStation(null);
         setFuelType(null);
         dispatch(
           setToast({
@@ -118,6 +146,12 @@ const AddFuel = ({ open, handleClose }) => {
           </IconButton>
         </Box>
         <Divider sx={{ mb: 2 }} />
+        {/* popup items */}
+        <AddPumpStation
+          open={addPumpOpen}
+          handleClose={() => setAddPumpOpen(false)}
+        />
+        {/* end popup items */}
         <Box
           component="form"
           autoComplete="off"
@@ -160,6 +194,45 @@ const AddFuel = ({ open, handleClose }) => {
                 onChange={(e, newValue) => setVehicle(newValue)}
               />
             </Grid>
+            <Grid item xs={12} md={5}>
+              <ControlledAutoComplete
+                label="Select Driver"
+                value={driver}
+                options={allDrivers}
+                getOptionLabel={(option) =>
+                  option.driverId + ', ' + option.name
+                }
+                isOptionEqualToValue={(item, value) => item.id === value.id}
+                onChange={(e, newValue) => setDriver(newValue)}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={7}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <ControlledAutoComplete
+                  label="Select Pump Station"
+                  value={pumpStation}
+                  options={allFuelPumps}
+                  getOptionLabel={(option) =>
+                    option.label +
+                    (option?.address ? ', ' + option?.address : '')
+                  }
+                  isOptionEqualToValue={(item, value) => item.id === value.id}
+                  onChange={(e, newValue) => setPumpStation(newValue)}
+                />
+                <Tooltip title="Add Pump Station">
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    sx={{ minWidth: 0, height: 32, width: 38, ml: 1, p: 0 }}
+                    onClick={() => setAddPumpOpen(true)}
+                  >
+                    <AddIcon fontSize="small" />
+                  </Button>
+                </Tooltip>
+              </Box>
+            </Grid>
             <Grid item xs={12} md={4}>
               <ControlledAutoComplete
                 label="Select Fuel Type"
@@ -175,11 +248,11 @@ const AddFuel = ({ open, handleClose }) => {
               <TextField
                 fullWidth
                 required
-                label="Quantity"
+                label="Quantity in Litre"
                 size="small"
                 type="number"
                 inputProps={{
-                  step: '0.0001',
+                  step: '0.01',
                 }}
                 {...register('quantity', {
                   required: true,
@@ -200,7 +273,16 @@ const AddFuel = ({ open, handleClose }) => {
                 })}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Odo Meter"
+                size="small"
+                type="number"
+                {...register('odoMeter', { valueAsNumber: true })}
+              />
+            </Grid>
+            <Grid item xs={12} md={8}>
               <TextField
                 fullWidth
                 label="Remarks"

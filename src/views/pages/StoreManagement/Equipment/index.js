@@ -13,15 +13,15 @@ import MainCard from 'ui-component/cards/MainCard';
 import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
-import AllTripRow from './AllTripRow';
-import { useTripsQuery } from 'store/api/trip/tripApi';
 import { useDebounced } from 'hooks';
-import { useNavigate } from 'react-router-dom';
+import { useGetEquipmentsQuery } from 'store/api/equipment/equipmentApi';
+import AddEquipment from './AddEquipment';
+import EquipmentRow from './EquipmentRow';
 
-const AllTrips = () => {
+const Equipment = () => {
   const [searchText, setSearchText] = useState('');
 
-  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   // pagination
   const [page, setPage] = useState(0);
@@ -53,29 +53,29 @@ const AllTrips = () => {
     query['searchTerm'] = debouncedSearchTerm;
   }
 
-  const { data, isLoading } = useTripsQuery(
+  const { data, isLoading } = useGetEquipmentsQuery(
     { ...query },
     { refetchOnMountOrArgChange: true }
   );
 
-  const allTrips = data?.trips || [];
+  const allEquipments = data?.equipments || [];
   const meta = data?.meta;
 
   let sn = page * rowsPerPage + 1;
   return (
     <MainCard
-      title="All Trips"
+      title="Equipments"
       secondary={
         <CardAction
-          title="Add Trip"
-          onClick={() => navigate('create')}
+          title="Add Equipment"
+          onClick={() => setOpen(true)}
           icon={<IconPlus />}
         />
       }
     >
       <Box sx={{ mb: 2 }}>
         <Grid container spacing={2} sx={{ alignItems: 'end' }}>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={5}>
             <InputBase
               fullWidth
               placeholder="Search..."
@@ -91,34 +91,32 @@ const AllTrips = () => {
           </Grid>
         </Grid>
       </Box>
+      {/* popup items */}
+      <AddEquipment open={open} handleClose={() => setOpen(false)} />
+      {/* end popup items */}
       <Box sx={{ overflow: 'auto' }}>
         <Table sx={{ minWidth: 400 }}>
           <TableHead>
             <StyledTableRow>
               <StyledTableCell align="center">SN</StyledTableCell>
-              <StyledTableCell>Trip Id</StyledTableCell>
-              <StyledTableCell>Vehicle</StyledTableCell>
               <StyledTableCell>Date</StyledTableCell>
-              <StyledTableCell>Party</StyledTableCell>
-              <StyledTableCell>Destination</StyledTableCell>
-              <StyledTableCell align="right">
-                Distance &#40;KM&#41;
-              </StyledTableCell>
-              <StyledTableCell align="right">Trip Fare</StyledTableCell>
-              <StyledTableCell align="right">Trip Expenses</StyledTableCell>
-              <StyledTableCell align="right">Net Profit</StyledTableCell>
-              <StyledTableCell align="center">Invoice</StyledTableCell>
+              <StyledTableCell>Title</StyledTableCell>
+              <StyledTableCell>Unit of Measurement</StyledTableCell>
+              <StyledTableCell align="right">Quantity</StyledTableCell>
+              <StyledTableCell align="right">Unit Price</StyledTableCell>
+              <StyledTableCell align="right">Total Price</StyledTableCell>
+              <StyledTableCell>Remarks</StyledTableCell>
               <StyledTableCell align="center">Action</StyledTableCell>
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {allTrips?.length ? (
-              allTrips.map((item) => (
-                <AllTripRow key={item.id} sn={sn++} data={item} />
+            {allEquipments?.length ? (
+              allEquipments.map((item) => (
+                <EquipmentRow key={item.id} sn={sn++} data={item} />
               ))
             ) : (
               <StyledTableRow>
-                <StyledTableCell colSpan={13} sx={{ border: 0 }} align="center">
+                <StyledTableCell colSpan={10} sx={{ border: 0 }} align="center">
                   {isLoading ? (
                     <LinearProgress sx={{ opacity: 0.5, py: 0.5 }} />
                   ) : (
@@ -143,4 +141,4 @@ const AllTrips = () => {
   );
 };
 
-export default AllTrips;
+export default Equipment;

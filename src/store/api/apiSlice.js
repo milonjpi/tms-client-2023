@@ -17,6 +17,7 @@ export const api = createApi({
     'expense-head',
     'fuel',
     'fuelType',
+    'fuelPump',
     'account-head',
     'income-head',
     'maintenance',
