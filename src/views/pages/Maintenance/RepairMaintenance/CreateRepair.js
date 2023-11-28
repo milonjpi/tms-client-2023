@@ -4,6 +4,12 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
+import Autocomplete from '@mui/material/Autocomplete';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -12,10 +18,14 @@ import TextField from '@mui/material/TextField';
 import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
 import { useDispatch } from 'react-redux';
-import { useForm, useWatch } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
 import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
 import moment from 'moment';
+import {
+  IconFileInvoice,
+  IconSquareRoundedPlusFilled,
+} from '@tabler/icons-react';
 import { useDriversQuery } from 'store/api/driver/driverApi';
 import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
 import { usePartiesQuery } from 'store/api/party/partyApi';
@@ -27,13 +37,13 @@ import { useGetExpenseHeadsQuery } from 'store/api/expenseHead/expenseHeadApi';
 import { useGetAccountHeadsQuery } from 'store/api/accountHead/accountHeadApi';
 import { useGetIncomeHeadsQuery } from 'store/api/incomeHead/incomeHeadApi';
 import { inputStyles } from 'ui-component/customStyles';
-import AddParty from '../Parties/AddParty';
 import { totalSum } from 'views/utilities/NeedyFunction';
+import AddParty from 'views/pages/TripManagement/Parties/AddParty';
+import SelectInHouseEquipment from './SelectInHouseEquipment';
 
-const CreateTrip = () => {
+const CreateRepair = () => {
   const navigate = useNavigate();
-  const [startDate, setStartDate] = useState(moment());
-  const [endDate, setEndDate] = useState(moment());
+  const [date, setDate] = useState(moment());
   const [vehicle, setVehicle] = useState(null);
   const [driver, setDriver] = useState(null);
   const [party, setParty] = useState(null);
@@ -57,12 +67,6 @@ const CreateTrip = () => {
     { refetchOnMountOrArgChange: true }
   );
   const allDrivers = driverData?.drivers || [];
-
-  const { data: partyData } = usePartiesQuery(
-    { limit: 100, isActive: true },
-    { refetchOnMountOrArgChange: true }
-  );
-  const allParties = partyData?.parties || [];
 
   // account heads
   const { data: accountHeads } = useGetAccountHeadsQuery(
@@ -100,10 +104,10 @@ const CreateTrip = () => {
   const [addTrip] = useAddTripMutation();
 
   const onSubmit = async (data) => {
+    console.log(data);
     const newData = {
       data: {
-        startDate,
-        endDate,
+        date,
         from: data?.from,
         to: data?.to,
         distance: data.distance || 0,
@@ -114,7 +118,7 @@ const CreateTrip = () => {
       },
       incomes: [
         {
-          date: startDate,
+          date: date,
           vehicleId: vehicle?.id,
           incomeHeadId: findTripFare?.id,
           amount: data?.tripValue,
@@ -122,7 +126,7 @@ const CreateTrip = () => {
         },
       ],
       expenses: data.expenses?.map((el) => ({
-        date: startDate,
+        date: date,
         vehicleId: vehicle?.id,
         expenseHeadId: el.expenseHeadId,
         unit: el.unit || 0,
@@ -131,41 +135,39 @@ const CreateTrip = () => {
       })),
     };
 
-    try {
-      setLoading(true);
-      const res = await addTrip({ ...newData }).unwrap();
-      if (res.success) {
-        setLoading(false);
-        reset();
-        setStartDate(moment());
-        setEndDate(moment());
-        setVehicle(null);
-        setDriver(null);
-        setParty(null);
-        dispatch(
-          setToast({
-            open: true,
-            variant: 'success',
-            message: res?.message,
-          })
-        );
-      }
-    } catch (err) {
-      setLoading(false);
-      dispatch(
-        setToast({
-          open: true,
-          variant: 'error',
-          message: err?.data?.message || 'Something Went Wrong',
-        })
-      );
-    }
+    // try {
+    //   setLoading(true);
+    //   const res = await addTrip({ ...newData }).unwrap();
+    //   if (res.success) {
+    //     setLoading(false);
+    //     reset();
+    //     setDate(moment());
+    //     setVehicle(null);
+    //     setDriver(null);
+    //     setParty(null);
+    //     dispatch(
+    //       setToast({
+    //         open: true,
+    //         variant: 'success',
+    //         message: res?.message,
+    //       })
+    //     );
+    //   }
+    // } catch (err) {
+    //   setLoading(false);
+    //   dispatch(
+    //     setToast({
+    //       open: true,
+    //       variant: 'error',
+    //       message: err?.data?.message || 'Something Went Wrong',
+    //     })
+    //   );
+    // }
   };
   const submitAndExit = async (data) => {
     const newData = {
       data: {
-        startDate,
-        endDate,
+        date,
         from: data?.from,
         to: data?.to,
         distance: data.distance || 0,
@@ -176,7 +178,7 @@ const CreateTrip = () => {
       },
       incomes: [
         {
-          date: startDate,
+          date: date,
           vehicleId: vehicle?.id,
           incomeHeadId: findTripFare?.id,
           amount: data?.tripValue,
@@ -184,7 +186,7 @@ const CreateTrip = () => {
         },
       ],
       expenses: data.expenses?.map((el) => ({
-        date: startDate,
+        date: date,
         vehicleId: vehicle?.id,
         expenseHeadId: el.expenseHeadId,
         unit: el.unit || 0,
@@ -199,8 +201,7 @@ const CreateTrip = () => {
       if (res.success) {
         setLoading(false);
         reset();
-        setStartDate(moment());
-        setEndDate(moment());
+        setDate(moment());
         setVehicle(null);
         setDriver(null);
         setParty(null);
@@ -211,7 +212,7 @@ const CreateTrip = () => {
             message: res?.message,
           })
         );
-        navigate('/pages/trip-management/all-trips');
+        navigate('/pages/maintenance/repair-maintenance');
       }
     } catch (err) {
       setLoading(false);
@@ -226,13 +227,13 @@ const CreateTrip = () => {
   };
   return (
     <MainCard
-      title="Create Trip"
+      title="New Repair Maintenance"
       secondary={
         <Button
           variant="contained"
           size="small"
           startIcon={<ReplyAllIcon />}
-          onClick={() => navigate('/pages/trip-management/all-trips')}
+          onClick={() => navigate('/pages/maintenance/repair-maintenance')}
         >
           Back
         </Button>
@@ -248,38 +249,15 @@ const CreateTrip = () => {
               Trip Details
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} lg={6}>
+              <Grid item xs={12}>
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                   <DatePicker
-                    label="Start Date"
+                    label="Maintenance Date"
                     views={['year', 'month', 'day']}
                     inputFormat="DD/MM/YYYY"
-                    value={startDate}
+                    value={date}
                     onChange={(newValue) => {
-                      setStartDate(newValue);
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        required
-                        size="small"
-                        autoComplete="off"
-                      />
-                    )}
-                  />
-                </LocalizationProvider>
-              </Grid>
-              <Grid item xs={12} lg={6}>
-                <LocalizationProvider dateAdapter={AdapterMoment}>
-                  <DatePicker
-                    label="End Date"
-                    views={['year', 'month', 'day']}
-                    minDate={startDate}
-                    inputFormat="DD/MM/YYYY"
-                    value={endDate}
-                    onChange={(newValue) => {
-                      setEndDate(newValue);
+                      setDate(newValue);
                     }}
                     renderInput={(params) => (
                       <TextField
@@ -309,7 +287,6 @@ const CreateTrip = () => {
               <Grid item xs={12}>
                 <ControlledAutoComplete
                   label="Select Driver"
-                  required
                   value={driver}
                   options={allDrivers}
                   getOptionLabel={(option) =>
@@ -319,86 +296,77 @@ const CreateTrip = () => {
                   onChange={(e, newValue) => setDriver(newValue)}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="From"
-                  size="small"
-                  required
-                  {...register('from', {
-                    required: true,
-                  })}
-                />
+
+              <Grid item xs={12} lg={6}>
+                <FormControl fullWidth size="small" required>
+                  <InputLabel id="work-shop-type-label">
+                    Workshop Type
+                  </InputLabel>
+                  <Select
+                    labelId="work-shop-type-label"
+                    label="Workshop Type"
+                    defaultValue=""
+                    {...register('workshopType')}
+                  >
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
+                    <MenuItem value="InHouse">In House</MenuItem>
+                    <MenuItem value="External">External</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="To"
-                  size="small"
-                  required
-                  {...register('to', {
-                    required: true,
-                  })}
-                />
+              <Grid item xs={12} lg={6}>
+                <FormControl fullWidth size="small" required>
+                  <InputLabel id="maintenance-type-label">
+                    Maintenance Type
+                  </InputLabel>
+                  <Select
+                    labelId="maintenance-type-label"
+                    label="Maintenance Type"
+                    defaultValue=""
+                    {...register('maintenanceType')}
+                  >
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
+                    <MenuItem value="Scheduled">Scheduled</MenuItem>
+                    <MenuItem value="UnScheduled">UnScheduled</MenuItem>
+                    <MenuItem value="Accidental">Accidental</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
-              <Grid item xs={12} md={5}>
+              <Grid item xs={12} lg={6}>
                 <TextField
                   fullWidth
-                  label="Distance"
+                  required
+                  label="Odo Meter"
                   size="small"
                   type="number"
-                  {...register('distance', {
+                  {...register('odoMeter', {
                     valueAsNumber: true,
+                    required: true,
                   })}
                 />
               </Grid>
-              <Grid item xs={12} md={7}>
+              <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Trip Value"
+                  label="Service Charge"
                   size="small"
                   type="number"
-                  required
-                  {...register('tripValue', {
-                    required: true,
+                  {...register('serviceCharge', {
                     valueAsNumber: true,
+                    required: true,
                   })}
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <ControlledAutoComplete
-                    label="Select Party"
-                    required
-                    value={party}
-                    options={allParties}
-                    getOptionLabel={(option) =>
-                      option.name +
-                      ', ' +
-                      option.address +
-                      ' - ' +
-                      option.mobile
-                    }
-                    isOptionEqualToValue={(item, value) => item.id === value.id}
-                    onChange={(e, newValue) => setParty(newValue)}
-                  />
-                  <Tooltip title="Add Party">
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      size="small"
-                      sx={{ minWidth: 0, height: 32, width: 38, ml: 1, p: 0 }}
-                      onClick={() => setPartyOpen(true)}
-                    >
-                      <AddIcon fontSize="small" />
-                    </Button>
-                  </Tooltip>
-                </Box>
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Remarks"
+                  multiline
+                  rows={2}
                   size="small"
                   {...register('remarks')}
                 />
@@ -414,79 +382,13 @@ const CreateTrip = () => {
               }}
             >
               <Typography sx={{ fontWeight: 700, pb: 2 }}>
-                Trip Expenses
+                Equipment Uses
               </Typography>
               <Typography sx={{ fontWeight: 700, pb: 2 }}>
                 Total: {totalExpenses}
               </Typography>
             </Box>
-            <Grid container spacing={2}>
-              {allExpenseHeads
-                ? allExpenseHeads?.map((el, index) => (
-                    <Grid item xs={12} md={6} key={el.id}>
-                      <Typography
-                        sx={{
-                          fontSize: 13,
-                          fontWeight: 700,
-                          color: '#999999',
-                          pb: 1,
-                        }}
-                      >
-                        {el.label}
-                      </Typography>
-                      <Grid container spacing={1}>
-                        <Grid item xs={0} sx={{ display: 'none' }}>
-                          <TextField
-                            fullWidth
-                            value={el.id}
-                            label={el.label}
-                            size="small"
-                            {...register(`expenses[${index}].expenseHeadId`)}
-                          />
-                        </Grid>
-                        <Grid item xs={5} lg={3}>
-                          <TextField
-                            fullWidth
-                            label="Qty"
-                            size="small"
-                            type="number"
-                            inputProps={{
-                              step: '0.01',
-                            }}
-                            sx={inputStyles.input}
-                            {...register(`expenses[${index}].unit`, {
-                              valueAsNumber: true,
-                            })}
-                          />
-                        </Grid>
-                        <Grid item xs={7} lg={4}>
-                          <TextField
-                            fullWidth
-                            label="Amount"
-                            size="small"
-                            type="number"
-                            sx={inputStyles.input}
-                            inputProps={{
-                              step: '0.01',
-                            }}
-                            {...register(`expenses[${index}].amount`, {
-                              valueAsNumber: true,
-                            })}
-                          />
-                        </Grid>
-                        <Grid item xs={12} lg={5}>
-                          <TextField
-                            fullWidth
-                            label="Remarks"
-                            size="small"
-                            {...register(`expenses[${index}].remarks`)}
-                          />
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  ))
-                : null}
-            </Grid>
+            <SelectInHouseEquipment control={control} register={register} />
           </Grid>
           <Grid item xs={12}>
             <LoadingButton
@@ -521,4 +423,4 @@ const CreateTrip = () => {
   );
 };
 
-export default CreateTrip;
+export default CreateRepair;

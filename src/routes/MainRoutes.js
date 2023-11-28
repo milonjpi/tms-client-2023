@@ -64,8 +64,12 @@ const FuelLogs = Loadable(
   lazy(() => import('views/pages/FuelManagement/FuelLogs'))
 );
 
-const TripExpense = Loadable(
-  lazy(() => import('views/pages/TheTrip/TripExpense'))
+// Maintenance Management
+const RepairMaintenance = Loadable(
+  lazy(() => import('views/pages/Maintenance/RepairMaintenance'))
+);
+const CreateRepair = Loadable(
+  lazy(() => import('views/pages/Maintenance/RepairMaintenance/CreateRepair'))
 );
 
 // store management
@@ -307,6 +311,38 @@ const MainRoutes = {
               ],
             },
             {
+              path: 'maintenance',
+              children: [
+                {
+                  path: 'repair-maintenance',
+                  children: [
+                    {
+                      path: '',
+                      element: (
+                        <AuthenticationRoutes
+                          allowedRoles={['super_admin', 'admin']}
+                          allowedCodes={['repair-maintenance']}
+                        >
+                          <RepairMaintenance />
+                        </AuthenticationRoutes>
+                      ),
+                    },
+                    {
+                      path: 'create-repair',
+                      element: (
+                        <AuthenticationRoutes
+                          allowedRoles={['super_admin', 'admin']}
+                          allowedCodes={['create-repair']}
+                        >
+                          <CreateRepair />
+                        </AuthenticationRoutes>
+                      ),
+                    },
+                  ],
+                },
+              ],
+            },
+            {
               path: 'store-management',
               children: [
                 {
@@ -343,44 +379,6 @@ const MainRoutes = {
                   ),
                 },
               ],
-            },
-            {
-              path: 'trip',
-              children: [
-                {
-                  path: 'all-trips',
-                  element: (
-                    <AuthenticationRoutes
-                      allowedRoles={['super_admin', 'admin']}
-                      allowedCodes={['all-trips']}
-                    >
-                      <AllTrips />
-                    </AuthenticationRoutes>
-                  ),
-                },
-                {
-                  path: 'trip-expense',
-                  element: (
-                    <AuthenticationRoutes
-                      allowedRoles={['super_admin', 'admin']}
-                      allowedCodes={['trip-expense']}
-                    >
-                      <TripExpense />
-                    </AuthenticationRoutes>
-                  ),
-                },
-              ],
-            },
-            {
-              path: 'fuel',
-              element: (
-                <AuthenticationRoutes
-                  allowedRoles={['super_admin', 'admin']}
-                  allowedCodes={['fuel']}
-                >
-                  <FuelLogs />
-                </AuthenticationRoutes>
-              ),
             },
           ],
         },

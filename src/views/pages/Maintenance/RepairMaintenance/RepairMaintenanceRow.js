@@ -11,15 +11,14 @@ import { setToast } from 'store/toastSlice';
 import ConfirmDialog from 'ui-component/ConfirmDialog';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
 import moment from 'moment';
-import UpdateTrip from './UpdateTrip';
-import { useDeleteTripMutation } from 'store/api/trip/tripApi';
 import { totalSum } from 'views/utilities/NeedyFunction';
-import TripInvoice from './TripInvoice';
+import { useDeleteTripMutation } from 'store/api/trip/tripApi';
+import { useNavigate } from 'react-router-dom';
 
-const AllTripRow = ({ sn, data }) => {
+const RepairMaintenanceRow = ({ sn, data }) => {
   const vehicle = data?.vehicle;
+  const navigate = useNavigate();
 
-  const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState(false);
   const [invoice, setInvoice] = useState(false);
 
@@ -50,7 +49,7 @@ const AllTripRow = ({ sn, data }) => {
       );
     }
   };
-  const tripExpenses = data?.tripExpenses || [];
+  const tripExpenses = data?.expenses || [];
   const totalExpenses = totalSum(tripExpenses, 'amount');
   const netProfit = (data?.tripValue || 0) - (totalExpenses || 0);
   return (
@@ -61,6 +60,7 @@ const AllTripRow = ({ sn, data }) => {
       <StyledTableCell>
         {moment(data?.startDate).format('DD/MM/YYYY')}
       </StyledTableCell>
+      <StyledTableCell>{data?.party?.name}</StyledTableCell>
       <StyledTableCell>{data?.from + ' to ' + data?.to}</StyledTableCell>
       <StyledTableCell align="right">{data?.distance}</StyledTableCell>
       <StyledTableCell align="right">{data?.tripValue}</StyledTableCell>
@@ -80,7 +80,7 @@ const AllTripRow = ({ sn, data }) => {
           <IconButton
             color="primary"
             size="small"
-            onClick={() => setOpen(true)}
+            onClick={() => navigate(`edit/${data?.id}`)}
           >
             <IconEdit color="#468B97" size={18} />
           </IconButton>
@@ -92,7 +92,7 @@ const AllTripRow = ({ sn, data }) => {
             <IconTrashXFilled size={18} />
           </IconButton>
         </ButtonGroup>
-        <TripInvoice
+        {/* <TripInvoice
           open={invoice}
           handleClose={() => setInvoice(false)}
           data={data}
@@ -102,15 +102,10 @@ const AllTripRow = ({ sn, data }) => {
           setOpen={setDialog}
           content="Delete Trip"
           handleDelete={handleDelete}
-        />
-        <UpdateTrip
-          open={open}
-          preData={data}
-          handleClose={() => setOpen(false)}
-        />
+        /> */}
       </StyledTableCell>
     </StyledTableRow>
   );
 };
 
-export default AllTripRow;
+export default RepairMaintenanceRow;

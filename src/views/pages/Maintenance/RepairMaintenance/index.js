@@ -14,14 +14,14 @@ import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
 import { useDebounced } from 'hooks';
-import { useGetFuelsQuery } from 'store/api/fuel/fuelApi';
-import AddFuel from './AddFuel';
-import FuelRow from './FuelRow';
+import { useNavigate } from 'react-router-dom';
+import { useGetMaintenancesQuery } from 'store/api/maintenance/maintenanceApi';
+import RepairMaintenanceRow from './RepairMaintenanceRow';
 
-const Fuels = () => {
+const RepairMaintenance = () => {
   const [searchText, setSearchText] = useState('');
 
-  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   // pagination
   const [page, setPage] = useState(0);
@@ -37,7 +37,7 @@ const Fuels = () => {
   };
   // end pagination
 
-  // filtering
+  // filtering and pagination
   const query = {};
 
   query['limit'] = rowsPerPage;
@@ -53,22 +53,22 @@ const Fuels = () => {
     query['searchTerm'] = debouncedSearchTerm;
   }
 
-  const { data, isLoading } = useGetFuelsQuery(
+  const { data, isLoading } = useGetMaintenancesQuery(
     { ...query },
     { refetchOnMountOrArgChange: true }
   );
 
-  const allFuels = data?.fuels || [];
+  const allMaintenances = data?.maintenances || [];
   const meta = data?.meta;
 
   let sn = page * rowsPerPage + 1;
   return (
     <MainCard
-      title="The Fuels"
+      title="Repair Maintenances"
       secondary={
         <CardAction
-          title="Add Fuel"
-          onClick={() => setOpen(true)}
+          title="Add Repair"
+          onClick={() => navigate('create-repair')}
           icon={<IconPlus />}
         />
       }
@@ -91,10 +91,6 @@ const Fuels = () => {
           </Grid>
         </Grid>
       </Box>
-      {/* popup items */}
-
-      <AddFuel open={open} handleClose={() => setOpen(false)} />
-      {/* end popup items */}
       <Box sx={{ overflow: 'auto' }}>
         <Table sx={{ minWidth: 400 }}>
           <TableHead>
@@ -102,24 +98,21 @@ const Fuels = () => {
               <StyledTableCell align="center">SN</StyledTableCell>
               <StyledTableCell>Date</StyledTableCell>
               <StyledTableCell>Vehicle</StyledTableCell>
-              <StyledTableCell>Fuel Type</StyledTableCell>
-              <StyledTableCell>UOM</StyledTableCell>
-              <StyledTableCell align="right">Quantity</StyledTableCell>
-              <StyledTableCell align="right">
-                Amount&#40;TK&#41;
-              </StyledTableCell>
-              <StyledTableCell>Remarks</StyledTableCell>
+              <StyledTableCell>Workshop Type</StyledTableCell>
+              <StyledTableCell>Maintenance Type</StyledTableCell>
+              <StyledTableCell>Service Charge</StyledTableCell>
+              <StyledTableCell align="center">Bill</StyledTableCell>
               <StyledTableCell align="center">Action</StyledTableCell>
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {allFuels?.length ? (
-              allFuels.map((item) => (
-                <FuelRow key={item.id} sn={sn++} data={item} />
+            {allMaintenances?.length ? (
+              allMaintenances.map((item) => (
+                <RepairMaintenanceRow key={item.id} sn={sn++} data={item} />
               ))
             ) : (
               <StyledTableRow>
-                <StyledTableCell colSpan={10} sx={{ border: 0 }} align="center">
+                <StyledTableCell colSpan={13} sx={{ border: 0 }} align="center">
                   {isLoading ? (
                     <LinearProgress sx={{ opacity: 0.5, py: 0.5 }} />
                   ) : (
@@ -144,4 +137,4 @@ const Fuels = () => {
   );
 };
 
-export default Fuels;
+export default RepairMaintenance;

@@ -25,7 +25,7 @@ import ReplyAllIcon from '@mui/icons-material/ReplyAll';
 import { useGetExpenseHeadsQuery } from 'store/api/expenseHead/expenseHeadApi';
 import { useGetAccountHeadsQuery } from 'store/api/accountHead/accountHeadApi';
 import { useGetIncomeHeadsQuery } from 'store/api/incomeHead/incomeHeadApi';
-import { inputStyles } from 'ui-component/cutomStyles';
+import { inputStyles } from 'ui-component/customStyles';
 import AddParty from '../Parties/AddParty';
 import LoadingPage from 'ui-component/LoadingPage';
 import Error404 from 'views/Error404';
