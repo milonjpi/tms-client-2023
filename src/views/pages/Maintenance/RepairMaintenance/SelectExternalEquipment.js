@@ -11,20 +11,19 @@ import {
 } from '@tabler/icons-react';
 import { Controller, useFieldArray } from 'react-hook-form';
 import { useGetEquipmentTitlesQuery } from 'store/api/equipmentTitle/equipmentTitleSlice';
-import { totalSum } from 'views/utilities/NeedyFunction';
 import { inputStyles } from 'ui-component/customStyles';
-import { useEffect } from 'react';
 
 const defaultEquipment = {
   equipment: null,
   quantity: 1,
+  totalPrice: '',
   remarks: '',
 };
 
-const SelectInHouseEquipment = ({ control, register, setValue }) => {
+const SelectExternalEquipment = ({ control, register }) => {
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'equipmentUses',
+    name: 'externalEquipmentUses',
   });
 
   const handleAppend = () => {
@@ -41,7 +40,6 @@ const SelectInHouseEquipment = ({ control, register, setValue }) => {
           handleRemove={handleRemove}
           control={control}
           register={register}
-          setValue={setValue}
         />
       ))}
       <Grid item xs={12} sx={{ textAlign: 'center' }}>
@@ -55,16 +53,9 @@ const SelectInHouseEquipment = ({ control, register, setValue }) => {
   );
 };
 
-export default SelectInHouseEquipment;
+export default SelectExternalEquipment;
 
-const EquipmentField = ({
-  field,
-  index,
-  handleRemove,
-  control,
-  register,
-  setValue,
-}) => {
+const EquipmentField = ({ field, index, handleRemove, control, register }) => {
   const [equipment, setEquipment] = useState(field?.equipment || null);
   // library
   const { data: equipmentTitlesData } = useGetEquipmentTitlesQuery(
@@ -75,25 +66,10 @@ const EquipmentField = ({
   const allEquipmentTitles = equipmentTitlesData?.equipmentTitles || [];
   // end library
 
-  const totalEquipmentPrice = totalSum(
-    equipment?.equipments || [],
-    'totalPrice'
-  );
-  const totalEquipment = totalSum(equipment?.equipments || [], 'quantity');
-  const usedEquipment = totalSum(equipment?.equipmentUses || [], 'quantity');
-  const availableEquipment = totalEquipment - usedEquipment;
-
-  const unitPrice = Number.isInteger(totalEquipmentPrice / totalEquipment)
-    ? totalEquipmentPrice / totalEquipment
-    : Number((totalEquipmentPrice / totalEquipment).toFixed(2));
-
-  useEffect(() => {
-    setValue(`equipmentUses.${index}.unitPrice`, unitPrice);
-  }, [setValue, index, unitPrice]);
   return (
     <Grid item xs={12}>
       <Grid container spacing={1}>
-        <Grid item xs={8} lg={4}>
+        <Grid item xs={12} lg={3.5}>
           <Controller
             render={({ field: { onChange, value } }) => (
               <Autocomplete
@@ -102,13 +78,6 @@ const EquipmentField = ({
                 options={allEquipmentTitles}
                 fullWidth
                 getOptionLabel={(option) => option.label}
-                getOptionDisabled={(option) =>
-                  totalSum(option?.equipments || [], 'quantity') -
-                    totalSum(option?.equipmentUses || [], 'quantity') <=
-                  0
-                    ? true
-                    : false
-                }
                 isOptionEqualToValue={(item, value) => item._id === value._id}
                 renderInput={(params) => (
                   <TextField {...params} label="Choose a Equipment" required />
@@ -120,53 +89,53 @@ const EquipmentField = ({
                 }}
               />
             )}
-            name={`equipmentUses[${index}].equipment`}
+            name={`externalEquipmentUses[${index}].equipment`}
             control={control}
             rules={{ required: true }}
           />
         </Grid>
-        <Grid item xs={4} lg={2}>
+        <Grid item xs={6} lg={2}>
           <TextField
             fullWidth
             required
-            label={`Qty${availableEquipment ? ` (${availableEquipment})` : ''}`}
+            label="Qty"
             size="small"
             type="number"
             inputProps={{
               step: '0.01',
             }}
             sx={inputStyles.input}
-            {...register(`equipmentUses[${index}].quantity`, {
+            {...register(`externalEquipmentUses[${index}].quantity`, {
               required: true,
               valueAsNumber: true,
             })}
           />
         </Grid>
-        <Grid item xs={0} sx={{ display: 'none' }}>
-          {unitPrice ? (
-            <TextField
-              fullWidth
-              value={unitPrice || 0}
-              size="small"
-              type="number"
-              inputProps={{
-                step: '0.01',
-              }}
-              sx={inputStyles.input}
-              {...register(`equipmentUses[${index}].unitPrice`, {
-                valueAsNumber: true,
-              })}
-            />
-          ) : null}
+        <Grid item xs={6} lg={2.5}>
+          <TextField
+            fullWidth
+            required
+            label="Total Price"
+            size="small"
+            type="number"
+            inputProps={{
+              step: '0.01',
+            }}
+            sx={inputStyles.input}
+            {...register(`externalEquipmentUses[${index}].totalPrice`, {
+              required: true,
+              valueAsNumber: true,
+            })}
+          />
         </Grid>
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={12} lg={4}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <TextField
               fullWidth
               label="Remarks"
               size="small"
               sx={{ mr: 1 }}
-              {...register(`equipmentUses[${index}].remarks`)}
+              {...register(`externalEquipmentUses[${index}].remarks`)}
             />
             <Tooltip title="Remove Row">
               <IconButton

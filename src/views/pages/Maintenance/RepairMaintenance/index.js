@@ -97,10 +97,13 @@ const RepairMaintenance = () => {
             <StyledTableRow>
               <StyledTableCell align="center">SN</StyledTableCell>
               <StyledTableCell>Date</StyledTableCell>
+              <StyledTableCell>Bill No</StyledTableCell>
               <StyledTableCell>Vehicle</StyledTableCell>
+              <StyledTableCell>Driver</StyledTableCell>
               <StyledTableCell>Workshop Type</StyledTableCell>
               <StyledTableCell>Maintenance Type</StyledTableCell>
-              <StyledTableCell>Service Charge</StyledTableCell>
+              <StyledTableCell align="right">Service Charge</StyledTableCell>
+              <StyledTableCell>Remarks</StyledTableCell>
               <StyledTableCell align="center">Bill</StyledTableCell>
               <StyledTableCell align="center">Action</StyledTableCell>
             </StyledTableRow>

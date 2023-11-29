@@ -44,7 +44,7 @@ const UpdateTrip = () => {
   const [party, setParty] = useState(tripData?.party || null);
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm({
-    defaultValues: { ...tripData, remarks: tripData?.incomes[0]?.remarks },
+    defaultValues: tripData,
   });
 
   const [partyOpen, setPartyOpen] = useState(false);
@@ -115,6 +115,7 @@ const UpdateTrip = () => {
         vehicleId: vehicle?.id,
         driverId: driver?.id,
         partyId: party?.id,
+        remarks: data?.remarks,
       },
       incomes: [
         {
@@ -164,7 +165,7 @@ const UpdateTrip = () => {
     }
   };
   useEffect(() => {
-    reset({ ...tripData, remarks: tripData?.incomes[0]?.remarks });
+    reset(tripData);
     setStartDate(tripData?.startDate);
     setEndDate(tripData?.endDate || null);
     setVehicle(tripData?.vehicle || null);

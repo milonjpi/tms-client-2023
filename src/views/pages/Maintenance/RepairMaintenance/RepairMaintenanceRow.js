@@ -11,25 +11,25 @@ import { setToast } from 'store/toastSlice';
 import ConfirmDialog from 'ui-component/ConfirmDialog';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
 import moment from 'moment';
-import { totalSum } from 'views/utilities/NeedyFunction';
-import { useDeleteTripMutation } from 'store/api/trip/tripApi';
 import { useNavigate } from 'react-router-dom';
+import { useDeleteMaintenanceMutation } from 'store/api/maintenance/maintenanceApi';
 
 const RepairMaintenanceRow = ({ sn, data }) => {
   const vehicle = data?.vehicle;
+  const driver = data?.driver;
   const navigate = useNavigate();
 
   const [dialog, setDialog] = useState(false);
-  const [invoice, setInvoice] = useState(false);
+  const [billOpen, setBillOpen] = useState(false);
 
-  const [deleteTrip] = useDeleteTripMutation();
+  const [deleteMaintenance] = useDeleteMaintenanceMutation();
 
   const dispatch = useDispatch();
 
   const handleDelete = async () => {
     setDialog(false);
     try {
-      const res = await deleteTrip(data?.id).unwrap();
+      const res = await deleteMaintenance(data?.id).unwrap();
       if (res.success) {
         dispatch(
           setToast({
@@ -49,28 +49,26 @@ const RepairMaintenanceRow = ({ sn, data }) => {
       );
     }
   };
-  const tripExpenses = data?.expenses || [];
-  const totalExpenses = totalSum(tripExpenses, 'amount');
-  const netProfit = (data?.tripValue || 0) - (totalExpenses || 0);
+
   return (
     <StyledTableRow>
       <StyledTableCell align="center">{sn}</StyledTableCell>
-      <StyledTableCell>{data?.tripId}</StyledTableCell>
-      <StyledTableCell>{vehicle?.regNo}</StyledTableCell>
       <StyledTableCell>
         {moment(data?.startDate).format('DD/MM/YYYY')}
       </StyledTableCell>
-      <StyledTableCell>{data?.party?.name}</StyledTableCell>
-      <StyledTableCell>{data?.from + ' to ' + data?.to}</StyledTableCell>
-      <StyledTableCell align="right">{data?.distance}</StyledTableCell>
-      <StyledTableCell align="right">{data?.tripValue}</StyledTableCell>
-      <StyledTableCell align="right">{totalExpenses}</StyledTableCell>
-      <StyledTableCell align="right">{netProfit}</StyledTableCell>
+      <StyledTableCell>{data?.billNo}</StyledTableCell>
+      <StyledTableCell>{vehicle?.regNo}</StyledTableCell>
+
+      <StyledTableCell>{driver?.name}</StyledTableCell>
+      <StyledTableCell>{data?.workshopType}</StyledTableCell>
+      <StyledTableCell>{data?.maintenanceType}</StyledTableCell>
+      <StyledTableCell align="right">{data?.serviceCharge}</StyledTableCell>
+      <StyledTableCell>{data?.remarks}</StyledTableCell>
       <StyledTableCell align="center">
         <IconButton
           color="secondary"
           size="small"
-          onClick={() => setInvoice(true)}
+          onClick={() => setBillOpen(true)}
         >
           <IconListSearch size={20} color="#614cab" />
         </IconButton>
@@ -96,13 +94,13 @@ const RepairMaintenanceRow = ({ sn, data }) => {
           open={invoice}
           handleClose={() => setInvoice(false)}
           data={data}
-        />
+        /> */}
         <ConfirmDialog
           open={dialog}
           setOpen={setDialog}
-          content="Delete Trip"
+          content="Delete Repair Maintenance"
           handleDelete={handleDelete}
-        /> */}
+        />
       </StyledTableCell>
     </StyledTableRow>
   );

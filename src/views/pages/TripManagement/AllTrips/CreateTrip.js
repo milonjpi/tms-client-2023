@@ -100,6 +100,16 @@ const CreateTrip = () => {
   const [addTrip] = useAddTripMutation();
 
   const onSubmit = async (data) => {
+    if (!startDate || !endDate || !vehicle || !driver || !party) {
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: 'Please Select All Required Fields',
+        })
+      );
+      return 1;
+    }
     const newData = {
       data: {
         startDate,
@@ -111,6 +121,7 @@ const CreateTrip = () => {
         vehicleId: vehicle?.id,
         driverId: driver?.id,
         partyId: party?.id,
+        remarks: data?.remarks,
       },
       incomes: [
         {
@@ -162,6 +173,16 @@ const CreateTrip = () => {
     }
   };
   const submitAndExit = async (data) => {
+    if (!startDate || !endDate || !vehicle || !driver || !party) {
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: 'Please Select All Required Fields',
+        })
+      );
+      return 1;
+    }
     const newData = {
       data: {
         startDate,
@@ -173,6 +194,7 @@ const CreateTrip = () => {
         vehicleId: vehicle?.id,
         driverId: driver?.id,
         partyId: party?.id,
+        remarks: data?.remarks,
       },
       incomes: [
         {
@@ -497,7 +519,6 @@ const CreateTrip = () => {
               loadingPosition="start"
               startIcon={<SaveIcon />}
               variant="contained"
-              type="submit"
               onClick={handleSubmit(onSubmit)}
             >
               Submit
@@ -508,7 +529,6 @@ const CreateTrip = () => {
               loading={loading}
               loadingPosition="start"
               startIcon={<SaveIcon />}
-              type="submit"
               variant="contained"
               onClick={handleSubmit(submitAndExit)}
             >

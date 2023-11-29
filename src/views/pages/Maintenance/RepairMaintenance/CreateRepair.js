@@ -3,57 +3,42 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import Autocomplete from '@mui/material/Autocomplete';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import TextField from '@mui/material/TextField';
 import SaveIcon from '@mui/icons-material/Save';
-import AddIcon from '@mui/icons-material/Add';
 import { useDispatch } from 'react-redux';
-import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
 import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
 import moment from 'moment';
-import {
-  IconFileInvoice,
-  IconSquareRoundedPlusFilled,
-} from '@tabler/icons-react';
 import { useDriversQuery } from 'store/api/driver/driverApi';
 import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
-import { usePartiesQuery } from 'store/api/party/partyApi';
-import { useAddTripMutation } from 'store/api/trip/tripApi';
 import MainCard from 'ui-component/cards/MainCard';
 import { useNavigate } from 'react-router-dom';
 import ReplyAllIcon from '@mui/icons-material/ReplyAll';
-import { useGetExpenseHeadsQuery } from 'store/api/expenseHead/expenseHeadApi';
-import { useGetAccountHeadsQuery } from 'store/api/accountHead/accountHeadApi';
-import { useGetIncomeHeadsQuery } from 'store/api/incomeHead/incomeHeadApi';
-import { inputStyles } from 'ui-component/customStyles';
 import { totalSum } from 'views/utilities/NeedyFunction';
-import AddParty from 'views/pages/TripManagement/Parties/AddParty';
 import SelectInHouseEquipment from './SelectInHouseEquipment';
+import SelectExternalEquipment from './SelectExternalEquipment';
+import { useAddMaintenanceMutation } from 'store/api/maintenance/maintenanceApi';
 
 const CreateRepair = () => {
   const navigate = useNavigate();
   const [date, setDate] = useState(moment());
   const [vehicle, setVehicle] = useState(null);
   const [driver, setDriver] = useState(null);
-  const [party, setParty] = useState(null);
+  const [workshopType, setWorkshopType] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, control, reset } = useForm();
+  const { register, handleSubmit, control, reset, setValue } = useForm();
 
   const getExpenses = useWatch({ control, name: 'expenses' });
   const totalExpenses = totalSum(getExpenses || [], 'amount');
-
-  const [partyOpen, setPartyOpen] = useState(false);
 
   // library
   const { data: vehicleData } = useVehiclesQuery(
@@ -68,143 +53,178 @@ const CreateRepair = () => {
   );
   const allDrivers = driverData?.drivers || [];
 
-  // account heads
-  const { data: accountHeads } = useGetAccountHeadsQuery(
-    { limit: 100 },
-    { refetchOnMountOrArgChange: true }
-  );
-  const allAccountHeads = accountHeads?.accountHeads || [];
-
-  // income head library
-  const findTripIncomeHead =
-    allAccountHeads?.find((el) => el.label === 'Trip Income') || null;
-
-  const { data: incomeHeadData } = useGetIncomeHeadsQuery(
-    { limit: 50, sortOrder: 'asc', accountHeadId: findTripIncomeHead?.id },
-    { refetchOnMountOrArgChange: true }
-  );
-
-  const allIncomeHeads = incomeHeadData?.incomeHeads || [];
-  const findTripFare = allIncomeHeads?.find((el) => el.label === 'Trip Fare');
-
-  // expense head library
-  const findTripExpenseHead =
-    allAccountHeads?.find((el) => el.label === 'Trip Expense') || null;
-
-  const { data: expenseHeadData } = useGetExpenseHeadsQuery(
-    { limit: 50, sortOrder: 'asc', accountHeadId: findTripExpenseHead?.id },
-    { refetchOnMountOrArgChange: true }
-  );
-
-  const allExpenseHeads = expenseHeadData?.expenseHeads || [];
   // end library
 
   const dispatch = useDispatch();
 
-  const [addTrip] = useAddTripMutation();
+  const [addMaintenance] = useAddMaintenanceMutation();
 
   const onSubmit = async (data) => {
-    console.log(data);
+    if (!date) {
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: 'Please Select Date',
+        })
+      );
+      return 1;
+    }
+    if (!vehicle) {
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: 'Please Select Vehicle',
+        })
+      );
+      return 1;
+    }
+
     const newData = {
       data: {
         date,
-        from: data?.from,
-        to: data?.to,
-        distance: data.distance || 0,
-        tripValue: data?.tripValue,
         vehicleId: vehicle?.id,
         driverId: driver?.id,
-        partyId: party?.id,
+        odoMeter: data?.odoMeter,
+        workshopType: data?.workshopType,
+        maintenanceType: data?.maintenanceType,
+        workshopDetails: data?.workshopDetails,
+        serviceCharge: data?.serviceCharge,
+        remarks: data?.remarks,
       },
-      incomes: [
-        {
-          date: date,
-          vehicleId: vehicle?.id,
-          incomeHeadId: findTripFare?.id,
-          amount: data?.tripValue,
-          remarks: data?.remarks,
-        },
-      ],
-      expenses: data.expenses?.map((el) => ({
-        date: date,
-        vehicleId: vehicle?.id,
-        expenseHeadId: el.expenseHeadId,
-        unit: el.unit || 0,
-        amount: el.amount || 0,
-        remarks: el.remarks,
-      })),
+      equipmentUses:
+        workshopType === 'InHouse'
+          ? data?.equipmentUses?.map((el) => ({
+              date,
+              vehicleId: vehicle?.id,
+              equipmentTitleId: el.equipment?.id,
+              quantity: el.quantity,
+              unitPrice: el.unitPrice,
+              totalPrice: Number.isInteger(el.unitPrice * el.quantity)
+                ? el.unitPrice * el.quantity
+                : Number((el.unitPrice * el.quantity).toFixed(2)),
+              remarks: el.remarks,
+            }))
+          : [],
+      externalEquipmentUses:
+        workshopType === 'External'
+          ? data?.externalEquipmentUses?.map((el) => ({
+              date,
+              vehicleId: vehicle?.id,
+              equipmentTitleId: el.equipment?.id,
+              quantity: el.quantity,
+              unitPrice: Number.isInteger(el.totalPrice / el.quantity)
+                ? el.totalPrice / el.quantity
+                : Number((el.totalPrice / el.quantity).toFixed(2)),
+              totalPrice: el.totalPrice,
+              remarks: el.remarks,
+            }))
+          : [],
     };
-
-    // try {
-    //   setLoading(true);
-    //   const res = await addTrip({ ...newData }).unwrap();
-    //   if (res.success) {
-    //     setLoading(false);
-    //     reset();
-    //     setDate(moment());
-    //     setVehicle(null);
-    //     setDriver(null);
-    //     setParty(null);
-    //     dispatch(
-    //       setToast({
-    //         open: true,
-    //         variant: 'success',
-    //         message: res?.message,
-    //       })
-    //     );
-    //   }
-    // } catch (err) {
-    //   setLoading(false);
-    //   dispatch(
-    //     setToast({
-    //       open: true,
-    //       variant: 'error',
-    //       message: err?.data?.message || 'Something Went Wrong',
-    //     })
-    //   );
-    // }
-  };
-  const submitAndExit = async (data) => {
-    const newData = {
-      data: {
-        date,
-        from: data?.from,
-        to: data?.to,
-        distance: data.distance || 0,
-        tripValue: data?.tripValue,
-        vehicleId: vehicle?.id,
-        driverId: driver?.id,
-        partyId: party?.id,
-      },
-      incomes: [
-        {
-          date: date,
-          vehicleId: vehicle?.id,
-          incomeHeadId: findTripFare?.id,
-          amount: data?.tripValue,
-          remarks: data?.remarks,
-        },
-      ],
-      expenses: data.expenses?.map((el) => ({
-        date: date,
-        vehicleId: vehicle?.id,
-        expenseHeadId: el.expenseHeadId,
-        unit: el.unit || 0,
-        amount: el.amount || 0,
-        remarks: el.remarks,
-      })),
-    };
-
     try {
       setLoading(true);
-      const res = await addTrip({ ...newData }).unwrap();
+      const res = await addMaintenance({ ...newData }).unwrap();
       if (res.success) {
         setLoading(false);
         reset();
         setDate(moment());
         setVehicle(null);
         setDriver(null);
-        setParty(null);
+        setWorkshopType('');
+        dispatch(
+          setToast({
+            open: true,
+            variant: 'success',
+            message: res?.message,
+          })
+        );
+      }
+    } catch (err) {
+      setLoading(false);
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: err?.data?.message || 'Something Went Wrong',
+        })
+      );
+    }
+  };
+  const submitAndExit = async (data) => {
+    if (!date) {
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: 'Please Select Date',
+        })
+      );
+      return 1;
+    }
+    if (!vehicle) {
+      dispatch(
+        setToast({
+          open: true,
+          variant: 'error',
+          message: 'Please Select Vehicle',
+        })
+      );
+      return 1;
+    }
+
+    const newData = {
+      data: {
+        date,
+        vehicleId: vehicle?.id,
+        driverId: driver?.id,
+        odoMeter: data?.odoMeter,
+        workshopType: data?.workshopType,
+        maintenanceType: data?.maintenanceType,
+        workshopDetails: data?.workshopDetails,
+        serviceCharge: data?.serviceCharge,
+        remarks: data?.remarks,
+      },
+      equipmentUses:
+        workshopType === 'InHouse'
+          ? data?.equipmentUses?.map((el) => ({
+              date,
+              vehicleId: vehicle?.id,
+              equipmentTitleId: el.equipment?.id,
+              quantity: el.quantity,
+              unitPrice: el.unitPrice,
+              totalPrice: Number.isInteger(el.unitPrice * el.quantity)
+                ? el.unitPrice * el.quantity
+                : Number((el.unitPrice * el.quantity).toFixed(2)),
+              remarks: el.remarks,
+            }))
+          : [],
+      externalEquipmentUses:
+        workshopType === 'External'
+          ? data?.externalEquipmentUses?.map((el) => ({
+              date,
+              vehicleId: vehicle?.id,
+              equipmentTitleId: el.equipment?.id,
+              quantity: el.quantity,
+              unitPrice: Number.isInteger(el.totalPrice / el.quantity)
+                ? el.totalPrice / el.quantity
+                : Number((el.totalPrice / el.quantity).toFixed(2)),
+              totalPrice: el.totalPrice,
+              remarks: el.remarks,
+            }))
+          : [],
+    };
+
+    try {
+      setLoading(true);
+      const res = await addMaintenance({ ...newData }).unwrap();
+      if (res.success) {
+        setLoading(false);
+        reset();
+        setDate(moment());
+        setVehicle(null);
+        setDriver(null);
+        setWorkshopType('');
         dispatch(
           setToast({
             open: true,
@@ -239,9 +259,6 @@ const CreateRepair = () => {
         </Button>
       }
     >
-      {/* popup items */}
-      <AddParty open={partyOpen} handleClose={() => setPartyOpen(false)} />
-      {/* end popup items */}
       <Box component="form" autoComplete="off">
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
@@ -303,10 +320,13 @@ const CreateRepair = () => {
                     Workshop Type
                   </InputLabel>
                   <Select
+                    value={workshopType}
                     labelId="work-shop-type-label"
                     label="Workshop Type"
-                    defaultValue=""
-                    {...register('workshopType')}
+                    {...register('workshopType', {
+                      required: true,
+                      onChange: (e) => setWorkshopType(e.target.value),
+                    })}
                   >
                     <MenuItem value="">
                       <em>None</em>
@@ -357,10 +377,21 @@ const CreateRepair = () => {
                   type="number"
                   {...register('serviceCharge', {
                     valueAsNumber: true,
-                    required: true,
                   })}
                 />
               </Grid>
+              {workshopType === 'External' ? (
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Workshop Details"
+                    size="small"
+                    {...register('workshopDetails', { required: true })}
+                  />
+                </Grid>
+              ) : null}
+
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -382,13 +413,30 @@ const CreateRepair = () => {
               }}
             >
               <Typography sx={{ fontWeight: 700, pb: 2 }}>
-                Equipment Uses
+                Equipment Uses{' '}
+                {workshopType === 'InHouse' ? (
+                  <span style={{ fontSize: 10 }}>&#40;In House&#41;</span>
+                ) : workshopType === 'External' ? (
+                  <span style={{ fontSize: 10 }}>&#40;External&#41;</span>
+                ) : (
+                  <span style={{ color: 'red', fontSize: 10 }}>
+                    &#40;Please Select Workshop Type&#41;
+                  </span>
+                )}
               </Typography>
               <Typography sx={{ fontWeight: 700, pb: 2 }}>
                 Total: {totalExpenses}
               </Typography>
             </Box>
-            <SelectInHouseEquipment control={control} register={register} />
+            {workshopType === 'InHouse' ? (
+              <SelectInHouseEquipment
+                control={control}
+                register={register}
+                setValue={setValue}
+              />
+            ) : workshopType === 'External' ? (
+              <SelectExternalEquipment control={control} register={register} />
+            ) : null}
           </Grid>
           <Grid item xs={12}>
             <LoadingButton
@@ -399,7 +447,6 @@ const CreateRepair = () => {
               loadingPosition="start"
               startIcon={<SaveIcon />}
               variant="contained"
-              type="submit"
               onClick={handleSubmit(onSubmit)}
             >
               Submit
@@ -410,7 +457,6 @@ const CreateRepair = () => {
               loading={loading}
               loadingPosition="start"
               startIcon={<SaveIcon />}
-              type="submit"
               variant="contained"
               onClick={handleSubmit(submitAndExit)}
             >
