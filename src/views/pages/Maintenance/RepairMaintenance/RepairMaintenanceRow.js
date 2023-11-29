@@ -54,7 +54,7 @@ const RepairMaintenanceRow = ({ sn, data }) => {
     <StyledTableRow>
       <StyledTableCell align="center">{sn}</StyledTableCell>
       <StyledTableCell>
-        {moment(data?.startDate).format('DD/MM/YYYY')}
+        {moment(data?.date).format('DD/MM/YYYY')}
       </StyledTableCell>
       <StyledTableCell>{data?.billNo}</StyledTableCell>
       <StyledTableCell>{vehicle?.regNo}</StyledTableCell>

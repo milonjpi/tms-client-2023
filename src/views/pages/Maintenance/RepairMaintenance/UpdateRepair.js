@@ -17,25 +17,39 @@ import { useDispatch } from 'react-redux';
 import { useForm, useWatch } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
 import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
-import moment from 'moment';
 import { useDriversQuery } from 'store/api/driver/driverApi';
 import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
 import MainCard from 'ui-component/cards/MainCard';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ReplyAllIcon from '@mui/icons-material/ReplyAll';
 import { totalSum } from 'views/utilities/NeedyFunction';
 import SelectInHouseEquipment from './SelectInHouseEquipment';
 import SelectExternalEquipment from './SelectExternalEquipment';
-import { useAddMaintenanceMutation } from 'store/api/maintenance/maintenanceApi';
+import {
+  useGetSingleMaintenanceQuery,
+  useUpdateMaintenanceMutation,
+} from 'store/api/maintenance/maintenanceApi';
+import { useEffect } from 'react';
+import LoadingPage from 'ui-component/LoadingPage';
+import Error404 from 'views/Error404';
 
-const CreateRepair = () => {
+const UpdateRepair = () => {
+  const { id } = useParams();
+  const { data: getMaintenanceData, isLoading } =
+    useGetSingleMaintenanceQuery(id);
+  const maintenanceData = getMaintenanceData?.data;
+
   const navigate = useNavigate();
-  const [date, setDate] = useState(moment());
-  const [vehicle, setVehicle] = useState(null);
-  const [driver, setDriver] = useState(null);
-  const [workshopType, setWorkshopType] = useState('');
+  const [date, setDate] = useState(maintenanceData?.date);
+  const [vehicle, setVehicle] = useState(maintenanceData?.vehicle || null);
+  const [driver, setDriver] = useState(maintenanceData?.driver || null);
+  const [workshopType, setWorkshopType] = useState(
+    maintenanceData?.workshopType || ''
+  );
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, control, reset, setValue } = useForm();
+  const { register, handleSubmit, control, reset, setValue } = useForm({
+    defaultValues: maintenanceData,
+  });
 
   const getExpenses = useWatch({ control, name: 'expenses' });
   const totalExpenses = totalSum(getExpenses || [], 'amount');
@@ -57,7 +71,7 @@ const CreateRepair = () => {
 
   const dispatch = useDispatch();
 
-  const [addMaintenance] = useAddMaintenanceMutation();
+  const [updateMaintenance] = useUpdateMaintenanceMutation();
 
   const onSubmit = async (data) => {
     if (!date) {
@@ -124,107 +138,12 @@ const CreateRepair = () => {
     };
     try {
       setLoading(true);
-      const res = await addMaintenance({ ...newData }).unwrap();
+      const res = await updateMaintenance({
+        id: maintenanceData?.id,
+        body: newData,
+      }).unwrap();
       if (res.success) {
         setLoading(false);
-        reset();
-        setDate(moment());
-        setVehicle(null);
-        setDriver(null);
-        setWorkshopType('');
-        dispatch(
-          setToast({
-            open: true,
-            variant: 'success',
-            message: res?.message,
-          })
-        );
-      }
-    } catch (err) {
-      setLoading(false);
-      dispatch(
-        setToast({
-          open: true,
-          variant: 'error',
-          message: err?.data?.message || 'Something Went Wrong',
-        })
-      );
-    }
-  };
-  const submitAndExit = async (data) => {
-    if (!date) {
-      dispatch(
-        setToast({
-          open: true,
-          variant: 'error',
-          message: 'Please Select Date',
-        })
-      );
-      return 1;
-    }
-    if (!vehicle) {
-      dispatch(
-        setToast({
-          open: true,
-          variant: 'error',
-          message: 'Please Select Vehicle',
-        })
-      );
-      return 1;
-    }
-
-    const newData = {
-      data: {
-        date,
-        vehicleId: vehicle?.id,
-        driverId: driver?.id,
-        odoMeter: data?.odoMeter,
-        workshopType: data?.workshopType,
-        maintenanceType: data?.maintenanceType,
-        workshopDetails: data?.workshopDetails,
-        serviceCharge: data?.serviceCharge,
-        remarks: data?.remarks,
-      },
-      equipmentUses:
-        workshopType === 'InHouse'
-          ? data?.equipmentUses?.map((el) => ({
-              date,
-              vehicleId: vehicle?.id,
-              equipmentTitleId: el.equipmentTitle?.id,
-              quantity: el.quantity,
-              unitPrice: el.unitPrice,
-              totalPrice: Number.isInteger(el.unitPrice * el.quantity)
-                ? el.unitPrice * el.quantity
-                : Number((el.unitPrice * el.quantity).toFixed(2)),
-              remarks: el.remarks,
-            }))
-          : [],
-      externalEquipmentUses:
-        workshopType === 'External'
-          ? data?.externalEquipmentUses?.map((el) => ({
-              date,
-              vehicleId: vehicle?.id,
-              equipmentTitleId: el.equipmentTitle?.id,
-              quantity: el.quantity,
-              unitPrice: Number.isInteger(el.totalPrice / el.quantity)
-                ? el.totalPrice / el.quantity
-                : Number((el.totalPrice / el.quantity).toFixed(2)),
-              totalPrice: el.totalPrice,
-              remarks: el.remarks,
-            }))
-          : [],
-    };
-
-    try {
-      setLoading(true);
-      const res = await addMaintenance({ ...newData }).unwrap();
-      if (res.success) {
-        setLoading(false);
-        reset();
-        setDate(moment());
-        setVehicle(null);
-        setDriver(null);
-        setWorkshopType('');
         dispatch(
           setToast({
             open: true,
@@ -245,9 +164,24 @@ const CreateRepair = () => {
       );
     }
   };
+
+  useEffect(() => {
+    reset(maintenanceData);
+    setDate(maintenanceData?.date);
+    setVehicle(maintenanceData?.vehicle || null);
+    setDriver(maintenanceData?.driver || null);
+    setWorkshopType(maintenanceData?.workshopType || '');
+  }, [reset, maintenanceData]);
+
+  if (!maintenanceData && isLoading) {
+    return <LoadingPage />;
+  }
+  if (!maintenanceData && !isLoading) {
+    return <Error404 />;
+  }
   return (
     <MainCard
-      title="New Repair Maintenance"
+      title="Edit Repair Maintenance"
       secondary={
         <Button
           variant="contained"
@@ -259,7 +193,11 @@ const CreateRepair = () => {
         </Button>
       }
     >
-      <Box component="form" autoComplete="off">
+      <Box
+        component="form"
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
             <Typography sx={{ fontWeight: 700, pb: 2 }}>
@@ -344,7 +282,7 @@ const CreateRepair = () => {
                   <Select
                     labelId="maintenance-type-label"
                     label="Maintenance Type"
-                    defaultValue=""
+                    defaultValue={maintenanceData?.maintenanceType || ''}
                     {...register('maintenanceType')}
                   >
                     <MenuItem value="">
@@ -440,6 +378,7 @@ const CreateRepair = () => {
           </Grid>
           <Grid item xs={12}>
             <LoadingButton
+              fullWidth
               size="small"
               color="primary"
               sx={{ mr: 2 }}
@@ -447,20 +386,9 @@ const CreateRepair = () => {
               loadingPosition="start"
               startIcon={<SaveIcon />}
               variant="contained"
-              onClick={handleSubmit(onSubmit)}
+              type="submit"
             >
-              Submit
-            </LoadingButton>
-            <LoadingButton
-              size="small"
-              color="error"
-              loading={loading}
-              loadingPosition="start"
-              startIcon={<SaveIcon />}
-              variant="contained"
-              onClick={handleSubmit(submitAndExit)}
-            >
-              Submit and Exit
+              Update
             </LoadingButton>
           </Grid>
         </Grid>
@@ -469,4 +397,4 @@ const CreateRepair = () => {
   );
 };
 
-export default CreateRepair;
+export default UpdateRepair;

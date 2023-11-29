@@ -14,7 +14,7 @@ import { useGetEquipmentTitlesQuery } from 'store/api/equipmentTitle/equipmentTi
 import { inputStyles } from 'ui-component/customStyles';
 
 const defaultEquipment = {
-  equipment: null,
+  equipmentTitle: null,
   quantity: 1,
   totalPrice: '',
   remarks: '',
@@ -56,7 +56,7 @@ const SelectExternalEquipment = ({ control, register }) => {
 export default SelectExternalEquipment;
 
 const EquipmentField = ({ field, index, handleRemove, control, register }) => {
-  const [equipment, setEquipment] = useState(field?.equipment || null);
+  const [equipment, setEquipment] = useState(field?.equipmentTitle || null);
   // library
   const { data: equipmentTitlesData } = useGetEquipmentTitlesQuery(
     { limit: 200, sortBy: 'label', sortOrder: 'asc' },
@@ -89,7 +89,7 @@ const EquipmentField = ({ field, index, handleRemove, control, register }) => {
                 }}
               />
             )}
-            name={`externalEquipmentUses[${index}].equipment`}
+            name={`externalEquipmentUses[${index}].equipmentTitle`}
             control={control}
             rules={{ required: true }}
           />

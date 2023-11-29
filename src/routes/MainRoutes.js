@@ -71,6 +71,9 @@ const RepairMaintenance = Loadable(
 const CreateRepair = Loadable(
   lazy(() => import('views/pages/Maintenance/RepairMaintenance/CreateRepair'))
 );
+const UpdateRepair = Loadable(
+  lazy(() => import('views/pages/Maintenance/RepairMaintenance/UpdateRepair'))
+);
 
 // store management
 const Equipment = Loadable(
@@ -332,9 +335,20 @@ const MainRoutes = {
                       element: (
                         <AuthenticationRoutes
                           allowedRoles={['super_admin', 'admin']}
-                          allowedCodes={['create-repair']}
+                          allowedCodes={['repair-maintenance']}
                         >
                           <CreateRepair />
+                        </AuthenticationRoutes>
+                      ),
+                    },
+                    {
+                      path: 'edit/:id',
+                      element: (
+                        <AuthenticationRoutes
+                          allowedRoles={['super_admin', 'admin']}
+                          allowedCodes={['repair-maintenance']}
+                        >
+                          <UpdateRepair />
                         </AuthenticationRoutes>
                       ),
                     },

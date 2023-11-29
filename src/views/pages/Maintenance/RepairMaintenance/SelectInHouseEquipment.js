@@ -16,7 +16,7 @@ import { inputStyles } from 'ui-component/customStyles';
 import { useEffect } from 'react';
 
 const defaultEquipment = {
-  equipment: null,
+  equipmentTitle: null,
   quantity: 1,
   remarks: '',
 };
@@ -65,7 +65,7 @@ const EquipmentField = ({
   register,
   setValue,
 }) => {
-  const [equipment, setEquipment] = useState(field?.equipment || null);
+  const [equipment, setEquipment] = useState(field?.equipmentTitle || null);
   // library
   const { data: equipmentTitlesData } = useGetEquipmentTitlesQuery(
     { limit: 200, sortBy: 'label', sortOrder: 'asc' },
@@ -120,7 +120,7 @@ const EquipmentField = ({
                 }}
               />
             )}
-            name={`equipmentUses[${index}].equipment`}
+            name={`equipmentUses[${index}].equipmentTitle`}
             control={control}
             rules={{ required: true }}
           />
