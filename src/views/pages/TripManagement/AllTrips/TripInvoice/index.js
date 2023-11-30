@@ -98,7 +98,7 @@ const TripInvoice = ({ open, handleClose, data }) => {
           <Box className="printPage">
             <Typography
               sx={{
-                fontSize: 30,
+                fontSize: 22,
                 textTransform: 'uppercase',
                 fontWeight: 700,
                 mb: 2,

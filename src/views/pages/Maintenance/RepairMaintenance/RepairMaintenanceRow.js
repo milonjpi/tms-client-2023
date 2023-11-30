@@ -13,6 +13,7 @@ import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import { useDeleteMaintenanceMutation } from 'store/api/maintenance/maintenanceApi';
+import MaintenanceBill from './MaintenanceBill';
 
 const RepairMaintenanceRow = ({ sn, data }) => {
   const vehicle = data?.vehicle;
@@ -90,11 +91,11 @@ const RepairMaintenanceRow = ({ sn, data }) => {
             <IconTrashXFilled size={18} />
           </IconButton>
         </ButtonGroup>
-        {/* <TripInvoice
-          open={invoice}
-          handleClose={() => setInvoice(false)}
+        <MaintenanceBill
+          open={billOpen}
+          handleClose={() => setBillOpen(false)}
           data={data}
-        /> */}
+        />
         <ConfirmDialog
           open={dialog}
           setOpen={setDialog}

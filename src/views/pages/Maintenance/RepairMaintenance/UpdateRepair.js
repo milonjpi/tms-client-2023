@@ -289,7 +289,7 @@ const UpdateRepair = () => {
                       <em>None</em>
                     </MenuItem>
                     <MenuItem value="Scheduled">Scheduled</MenuItem>
-                    <MenuItem value="UnScheduled">UnScheduled</MenuItem>
+                    <MenuItem value="Unscheduled">Unscheduled</MenuItem>
                     <MenuItem value="Accidental">Accidental</MenuItem>
                   </Select>
                 </FormControl>

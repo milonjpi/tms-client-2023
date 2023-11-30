@@ -81,6 +81,7 @@ const AddVehicle = ({ open, handleClose }) => {
         handleClose();
         setLoading(false);
         reset();
+        setDriver(null);
         dispatch(
           setToast({
             open: true,
