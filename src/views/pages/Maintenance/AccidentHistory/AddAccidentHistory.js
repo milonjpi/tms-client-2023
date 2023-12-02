@@ -4,6 +4,10 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Divider from '@mui/material/Divider';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -19,8 +23,8 @@ import { setToast } from 'store/toastSlice';
 import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
 import moment from 'moment';
 import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
-import { useGetExpenseHeadsQuery } from 'store/api/expenseHead/expenseHeadApi';
-import { useAddExpenseMutation } from 'store/api/expense/expenseApi';
+import { useDriversQuery } from 'store/api/driver/driverApi';
+import { useAddAccidentHistoryMutation } from 'store/api/accidentHistory/accidentHistoryApi';
 
 const style = {
   position: 'absolute',
@@ -34,11 +38,14 @@ const style = {
   p: 2,
 };
 
-const AddExpense = ({ open, handleClose }) => {
+const AddAccidentHistory = ({ open, handleClose }) => {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(moment());
   const [vehicle, setVehicle] = useState(null);
-  const [expense, setExpense] = useState(null);
+  const [driver, setDriver] = useState(null);
+
+  const [amountStatus, setAmountStatus] = useState('Nothing');
+
   const { register, handleSubmit, reset } = useForm();
 
   // library
@@ -48,36 +55,40 @@ const AddExpense = ({ open, handleClose }) => {
   );
   const allVehicles = vehicleData?.vehicles || [];
 
-  const { data: headData } = useGetExpenseHeadsQuery(
-    { limit: 100, type: 'general', isActive: true, sortOrder: 'asc' },
+  const { data: driverData } = useDriversQuery(
+    { limit: 100, isActive: true },
     { refetchOnMountOrArgChange: true }
   );
-
-  const allExpenseHeads = headData?.expenseHeads || [];
+  const allDrivers = driverData?.drivers || [];
 
   // end library
 
   const dispatch = useDispatch();
 
-  const [addExpense] = useAddExpenseMutation();
+  const [addAccidentHistory] = useAddAccidentHistoryMutation();
+
   const onSubmit = async (data) => {
     const newData = {
       date,
       vehicleId: vehicle?.id,
-      expenseHeadId: expense?.id,
-      description: data?.description,
-      amount: data?.amount,
+      driverId: driver?.id,
+      details: data?.details,
+      location: data?.location,
+      amountStatus: amountStatus,
+      totalAmount: data?.totalAmount || 0,
+      odoMeter: data?.odoMeter,
     };
     try {
       setLoading(true);
-      const res = await addExpense({ ...newData }).unwrap();
+      const res = await addAccidentHistory({ ...newData }).unwrap();
       if (res.success) {
         handleClose();
         setLoading(false);
         reset();
         setDate(moment());
         setVehicle(null);
-        setExpense(null);
+        setDriver(null);
+        setAmountStatus('Nothing');
         dispatch(
           setToast({
             open: true,
@@ -109,7 +120,7 @@ const AddExpense = ({ open, handleClose }) => {
           }}
         >
           <Typography sx={{ fontSize: 16, color: '#878781' }}>
-            Add Expense
+            Add Accident History
           </Typography>
           <IconButton
             color="error"
@@ -130,7 +141,7 @@ const AddExpense = ({ open, handleClose }) => {
               <LocalizationProvider dateAdapter={AdapterMoment}>
                 <DatePicker
                   disableFuture
-                  label="Select Date"
+                  label="Accident Date"
                   views={['year', 'month', 'day']}
                   inputFormat="DD/MM/YYYY"
                   value={date}
@@ -162,42 +173,76 @@ const AddExpense = ({ open, handleClose }) => {
                 onChange={(e, newValue) => setVehicle(newValue)}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={5}>
               <ControlledAutoComplete
-                label="Select Expense Head"
+                label="Select Driver"
                 required
-                value={expense}
-                options={allExpenseHeads}
-                getOptionLabel={(option) => option.label}
+                value={driver}
+                options={allDrivers}
+                getOptionLabel={(option) =>
+                  option.driverId + ', ' + option.name
+                }
                 isOptionEqualToValue={(item, value) => item.id === value.id}
-                onChange={(e, newValue) => setExpense(newValue)}
+                onChange={(e, newValue) => setDriver(newValue)}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={7}>
               <TextField
                 fullWidth
                 required
-                label="Amount (TK)"
+                label="Location"
                 size="small"
-                type="number"
-                {...register('amount', {
-                  required: true,
-                  valueAsNumber: true,
-                })}
+                {...register('location', { required: true })}
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
                 required
-                label="Description"
+                label="Accident Details"
                 size="small"
-                {...register('description', {
+                {...register('details', { required: true })}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                required
+                label="Odo Meter"
+                size="small"
+                type="number"
+                {...register('odoMeter', {
+                  valueAsNumber: true,
                   required: true,
                 })}
               />
             </Grid>
-
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth size="small" required>
+                <InputLabel id="amount-status-id">Amount Status</InputLabel>
+                <Select
+                  labelId="amount-status-id"
+                  value={amountStatus}
+                  label="Amount Status"
+                  onChange={(e) => setAmountStatus(e.target.value)}
+                >
+                  <MenuItem value="Nothing">Nothing</MenuItem>
+                  <MenuItem value="Paid">Paid</MenuItem>
+                  <MenuItem value="Received">Received</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              {['Paid', 'Received'].includes(amountStatus) ? (
+                <TextField
+                  fullWidth
+                  label="Paid/Received Amount"
+                  size="small"
+                  type="number"
+                  {...register('totalAmount', { valueAsNumber: true })}
+                />
+              ) : null}
+            </Grid>
             <Grid item xs={12}>
               <LoadingButton
                 fullWidth
@@ -219,4 +264,4 @@ const AddExpense = ({ open, handleClose }) => {
   );
 };
 
-export default AddExpense;
+export default AddAccidentHistory;

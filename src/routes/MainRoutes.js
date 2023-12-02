@@ -74,6 +74,9 @@ const CreateRepair = Loadable(
 const UpdateRepair = Loadable(
   lazy(() => import('views/pages/Maintenance/RepairMaintenance/UpdateRepair'))
 );
+const AccidentHistory = Loadable(
+  lazy(() => import('views/pages/Maintenance/AccidentHistory'))
+);
 
 // store management
 const Equipment = Loadable(
@@ -83,6 +86,14 @@ const EquipmentTitle = Loadable(
   lazy(() => import('views/pages/StoreManagement/EquipmentTitle'))
 );
 const Uom = Loadable(lazy(() => import('views/pages/StoreManagement/Uom')));
+
+// Miscellaneous expenses
+const MiscellaneousExpenses = Loadable(
+  lazy(() => import('views/pages/Expenses/AllMiscellaneousExpenses'))
+);
+const ExpenseHeads = Loadable(
+  lazy(() => import('views/pages/Expenses/ExpenseHeads'))
+);
 
 // utilities routing
 
@@ -354,6 +365,17 @@ const MainRoutes = {
                     },
                   ],
                 },
+                {
+                  path: 'accident-history',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['accident-history']}
+                    >
+                      <AccidentHistory />
+                    </AuthenticationRoutes>
+                  ),
+                },
               ],
             },
             {
@@ -389,6 +411,33 @@ const MainRoutes = {
                       allowedCodes={['uom']}
                     >
                       <Uom />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'expense',
+              children: [
+                {
+                  path: '',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['expense']}
+                    >
+                      <MiscellaneousExpenses />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'expense-head',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['expense-head']}
+                    >
+                      <ExpenseHeads />
                     </AuthenticationRoutes>
                   ),
                 },

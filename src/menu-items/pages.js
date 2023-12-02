@@ -201,11 +201,24 @@ const pages = {
 
     {
       id: 'expense',
-      title: 'Expenses',
-      type: 'item',
+      title: 'Miscellaneous Expenses',
+      type: 'collapse',
       color: '#2F0F5D',
       icon: icons.IconCashOff,
-      url: '/pages/expense',
+      children: [
+        {
+          id: 'expense-head',
+          title: 'Expense Heads',
+          type: 'item',
+          url: '/pages/expense/expense-head',
+        },
+        {
+          id: 'expense',
+          title: 'All Expenses',
+          type: 'item',
+          url: '/pages/expense',
+        },
+      ],
     },
     {
       id: 'paper',

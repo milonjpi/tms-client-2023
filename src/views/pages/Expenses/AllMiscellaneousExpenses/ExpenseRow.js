@@ -49,7 +49,7 @@ const ExpenseRow = ({ sn, data }) => {
       </StyledTableCell>
       <StyledTableCell>{data?.vehicle?.regNo}</StyledTableCell>
       <StyledTableCell>{data?.expenseHead?.label}</StyledTableCell>
-      <StyledTableCell>{data?.description}</StyledTableCell>
+      <StyledTableCell>{data?.remarks}</StyledTableCell>
       <StyledTableCell align="right">{data?.amount}</StyledTableCell>
       <StyledTableCell align="center">
         <ButtonGroup>

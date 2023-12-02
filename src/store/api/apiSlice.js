@@ -26,6 +26,8 @@ export const api = createApi({
     'uom',
     'user',
     'vehicle',
+    'accident-history',
+    'expense',
   ],
   endpoints: () => ({}),
 });

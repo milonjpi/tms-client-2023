@@ -14,11 +14,11 @@ import CardAction from 'ui-component/cards/CardAction';
 import { IconPlus } from '@tabler/icons-react';
 import { StyledTableCell, StyledTableRow } from 'ui-component/table-component';
 import { useDebounced } from 'hooks';
-import { useGetExpensesQuery } from 'store/api/expense/expenseApi';
-import AddExpense from './AddExpense';
-import ExpenseRow from './ExpenseRow';
+import AccidentHistoryRow from './AccidentHistoryRow';
+import AddAccidentHistory from './AddAccidentHistory';
+import { useGetHistoriesQuery } from 'store/api/accidentHistory/accidentHistoryApi';
 
-const Expenses = () => {
+const AccidentHistory = () => {
   const [searchText, setSearchText] = useState('');
 
   const [open, setOpen] = useState(false);
@@ -53,21 +53,21 @@ const Expenses = () => {
     query['searchTerm'] = debouncedSearchTerm;
   }
 
-  const { data, isLoading } = useGetExpensesQuery(
+  const { data, isLoading } = useGetHistoriesQuery(
     { ...query },
     { refetchOnMountOrArgChange: true }
   );
 
-  const allExpenses = data?.expenses || [];
+  const allAccidentHistories = data?.accidentHistories || [];
   const meta = data?.meta;
 
   let sn = page * rowsPerPage + 1;
   return (
     <MainCard
-      title="General Expenses"
+      title="Accident History"
       secondary={
         <CardAction
-          title="Add Expense"
+          title="Add Accident History"
           onClick={() => setOpen(true)}
           icon={<IconPlus />}
         />
@@ -93,7 +93,7 @@ const Expenses = () => {
       </Box>
       {/* popup items */}
 
-      <AddExpense open={open} handleClose={() => setOpen(false)} />
+      <AddAccidentHistory open={open} handleClose={() => setOpen(false)} />
       {/* end popup items */}
       <Box sx={{ overflow: 'auto' }}>
         <Table sx={{ minWidth: 400 }}>
@@ -102,22 +102,25 @@ const Expenses = () => {
               <StyledTableCell align="center">SN</StyledTableCell>
               <StyledTableCell>Date</StyledTableCell>
               <StyledTableCell>Vehicle</StyledTableCell>
-              <StyledTableCell>Expense Head</StyledTableCell>
-              <StyledTableCell>Description</StyledTableCell>
+              <StyledTableCell>Driver</StyledTableCell>
+              <StyledTableCell>Location</StyledTableCell>
+              <StyledTableCell>Details</StyledTableCell>
+              <StyledTableCell>Amount Status</StyledTableCell>
               <StyledTableCell align="right">
                 Amount&#40;TK&#41;
               </StyledTableCell>
+              <StyledTableCell align="right">Odometer</StyledTableCell>
               <StyledTableCell align="center">Action</StyledTableCell>
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {allExpenses?.length ? (
-              allExpenses.map((item) => (
-                <ExpenseRow key={item.id} sn={sn++} data={item} />
+            {allAccidentHistories?.length ? (
+              allAccidentHistories.map((item) => (
+                <AccidentHistoryRow key={item.id} sn={sn++} data={item} />
               ))
             ) : (
               <StyledTableRow>
-                <StyledTableCell colSpan={10} sx={{ border: 0 }} align="center">
+                <StyledTableCell colSpan={12} sx={{ border: 0 }} align="center">
                   {isLoading ? (
                     <LinearProgress sx={{ opacity: 0.5, py: 0.5 }} />
                   ) : (
@@ -142,4 +145,4 @@ const Expenses = () => {
   );
 };
 
-export default Expenses;
+export default AccidentHistory;

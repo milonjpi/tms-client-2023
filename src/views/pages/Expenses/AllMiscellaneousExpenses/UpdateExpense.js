@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Modal from '@mui/material/Modal';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
+import Tooltip from '@mui/material/Tooltip';
+import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
@@ -13,6 +15,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
+import AddIcon from '@mui/icons-material/Add';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { setToast } from 'store/toastSlice';
@@ -20,6 +23,8 @@ import { useVehiclesQuery } from 'store/api/vehicle/vehicleApi';
 import ControlledAutoComplete from 'ui-component/form-components/ControlledAutoComplete';
 import { useGetExpenseHeadsQuery } from 'store/api/expenseHead/expenseHeadApi';
 import { useUpdateExpenseMutation } from 'store/api/expense/expenseApi';
+import { useGetAccountHeadsQuery } from 'store/api/accountHead/accountHeadApi';
+import AddExpenseHead from '../ExpenseHeads/AddExpenseHead';
 
 const style = {
   position: 'absolute',
@@ -35,10 +40,12 @@ const style = {
 
 const UpdateExpense = ({ open, handleClose, preData }) => {
   const [loading, setLoading] = useState(false);
-  const [date, setDate] = useState(preData?.date || null);
-  const [vehicle, setVehicle] = useState(preData?.vehicle || null);
-  const [expense, setExpense] = useState(preData?.expenseHead || null);
+  const [date, setDate] = useState(preData?.date);
+  const [vehicle, setVehicle] = useState(preData?.vehicle);
+  const [expense, setExpense] = useState(preData?.expenseHead);
   const { register, handleSubmit } = useForm({ defaultValues: preData });
+
+  const [headOpen, setHeadOpen] = useState(false);
 
   // library
   const { data: vehicleData } = useVehiclesQuery(
@@ -47,24 +54,35 @@ const UpdateExpense = ({ open, handleClose, preData }) => {
   );
   const allVehicles = vehicleData?.vehicles || [];
 
-  const { data: headData } = useGetExpenseHeadsQuery(
-    { limit: 100, type: 'general', isActive: true, sortOrder: 'asc' },
+  // account heads
+  const { data: accountHeads } = useGetAccountHeadsQuery(
+    { limit: 100 },
+    { refetchOnMountOrArgChange: true }
+  );
+  const allAccountHeads = accountHeads?.accountHeads || [];
+
+  // expense head library
+  const findMiscellaneousHead =
+    allAccountHeads?.find((el) => el.label === 'Miscellaneous Expense') || null;
+
+  const { data: expenseHeadData } = useGetExpenseHeadsQuery(
+    { limit: 200, sortOrder: 'asc', accountHeadId: findMiscellaneousHead?.id },
     { refetchOnMountOrArgChange: true }
   );
 
-  const allExpenseHeads = headData?.expenseHeads || [];
+  const allExpenseHeads = expenseHeadData?.expenseHeads || [];
+
   // end library
 
   const dispatch = useDispatch();
 
   const [updateExpense] = useUpdateExpenseMutation();
-
   const onSubmit = async (data) => {
     const newData = {
       date,
       vehicleId: vehicle?.id,
       expenseHeadId: expense?.id,
-      description: data?.description,
+      remarks: data?.remarks,
       amount: data?.amount,
     };
     try {
@@ -74,8 +92,8 @@ const UpdateExpense = ({ open, handleClose, preData }) => {
         body: newData,
       }).unwrap();
       if (res.success) {
-        setLoading(false);
         handleClose();
+        setLoading(false);
         dispatch(
           setToast({
             open: true,
@@ -107,7 +125,7 @@ const UpdateExpense = ({ open, handleClose, preData }) => {
           }}
         >
           <Typography sx={{ fontSize: 16, color: '#878781' }}>
-            Edit Expense
+            Edit Miscellaneous Expense
           </Typography>
           <IconButton
             color="error"
@@ -118,6 +136,13 @@ const UpdateExpense = ({ open, handleClose, preData }) => {
           </IconButton>
         </Box>
         <Divider sx={{ mb: 2 }} />
+        {/* pop up items */}
+        <AddExpenseHead
+          open={headOpen}
+          handleClose={() => setHeadOpen(false)}
+          accountHeadId={findMiscellaneousHead?.id}
+        />
+        {/* end pop up items */}
         <Box
           component="form"
           autoComplete="off"
@@ -160,18 +185,31 @@ const UpdateExpense = ({ open, handleClose, preData }) => {
                 onChange={(e, newValue) => setVehicle(newValue)}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
-              <ControlledAutoComplete
-                label="Select Expense Head"
-                required
-                value={expense}
-                options={allExpenseHeads}
-                getOptionLabel={(option) => option.label}
-                isOptionEqualToValue={(item, value) => item.id === value.id}
-                onChange={(e, newValue) => setExpense(newValue)}
-              />
+            <Grid item xs={12} md={8}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <ControlledAutoComplete
+                  label="Select Expense Head"
+                  required
+                  value={expense}
+                  options={allExpenseHeads}
+                  getOptionLabel={(option) => option.label}
+                  isOptionEqualToValue={(item, value) => item.id === value.id}
+                  onChange={(e, newValue) => setExpense(newValue)}
+                />
+                <Tooltip title="Add Head">
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    sx={{ minWidth: 0, height: 32, width: 38, ml: 1, p: 0 }}
+                    onClick={() => setHeadOpen(true)}
+                  >
+                    <AddIcon fontSize="small" />
+                  </Button>
+                </Tooltip>
+              </Box>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
                 required
@@ -190,11 +228,12 @@ const UpdateExpense = ({ open, handleClose, preData }) => {
                 required
                 label="Description"
                 size="small"
-                {...register('description', {
+                {...register('remarks', {
                   required: true,
                 })}
               />
             </Grid>
+
             <Grid item xs={12}>
               <LoadingButton
                 fullWidth
