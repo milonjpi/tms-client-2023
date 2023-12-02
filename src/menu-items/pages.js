@@ -228,22 +228,28 @@ const pages = {
       icon: icons.IconFileCertificate,
       children: [
         {
+          id: 'registration',
+          title: 'Registration',
+          type: 'item',
+          url: '/pages/paper/registration',
+        },
+        {
           id: 'tax',
           title: 'Tax/Token',
           type: 'item',
-          url: '/page/paper/tax',
+          url: '/pages/paper/tax',
         },
         {
           id: 'fitness',
           title: 'Fitness',
           type: 'item',
-          url: '/page/paper/fitness',
+          url: '/pages/paper/fitness',
         },
         {
           id: 'route',
           title: 'Route Permit',
           type: 'item',
-          url: '/page/paper/route',
+          url: '/pages/paper/route',
         },
       ],
     },

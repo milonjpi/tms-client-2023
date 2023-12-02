@@ -95,6 +95,12 @@ const ExpenseHeads = Loadable(
   lazy(() => import('views/pages/Expenses/ExpenseHeads'))
 );
 
+// Paper work
+const VehicleRegistration = Loadable(
+  lazy(() => import('views/pages/PaperWork/VehicleRegistration'))
+);
+
+
 // utilities routing
 
 // setting routing
@@ -438,6 +444,22 @@ const MainRoutes = {
                       allowedCodes={['expense-head']}
                     >
                       <ExpenseHeads />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'paper',
+              children: [
+                {
+                  path: 'registration',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['registration']}
+                    >
+                      <VehicleRegistration />
                     </AuthenticationRoutes>
                   ),
                 },
