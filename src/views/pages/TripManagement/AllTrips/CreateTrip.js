@@ -47,7 +47,7 @@ const CreateTrip = () => {
 
   // library
   const { data: vehicleData } = useVehiclesQuery(
-    { limit: 100, isActive: true },
+    { limit: 100, sortBy: 'vehicleId', sortOrder: 'asc', isActive: true },
     { refetchOnMountOrArgChange: true }
   );
   const allVehicles = vehicleData?.vehicles || [];

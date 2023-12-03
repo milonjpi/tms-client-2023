@@ -45,7 +45,7 @@ const UpdatePaperWork = ({ open, handleClose, preData }) => {
 
   // library
   const { data: vehicleData } = useVehiclesQuery(
-    { limit: 100, isActive: true },
+    { limit: 100, isActive: true, sortBy: 'vehicleId', sortOrder: 'asc' },
     { refetchOnMountOrArgChange: true }
   );
   const allVehicles = vehicleData?.vehicles || [];
@@ -63,13 +63,11 @@ const UpdatePaperWork = ({ open, handleClose, preData }) => {
       certificateNo: data?.certificateNo,
       effectiveDate,
       expiryDate,
-      daysToRemind:
-        expiryDate && data?.daysToRemind
-          ? expiryDate.subtract(data?.daysToRemind, 'days')
-          : null,
+      daysToRemind: data?.daysToRemind || 0,
       fee: data?.fee,
       otherAmount: data?.otherAmount || 0,
       totalAmount: data?.fee + (data?.otherAmount || 0),
+      odoMeter: data?.odoMeter || 0,
       remarks: data?.remarks,
     };
     try {
@@ -112,7 +110,7 @@ const UpdatePaperWork = ({ open, handleClose, preData }) => {
           }}
         >
           <Typography sx={{ fontSize: 16, color: '#878781' }}>
-            Edit Registration Document
+            Edit Document
           </Typography>
           <IconButton
             color="error"
@@ -133,7 +131,7 @@ const UpdatePaperWork = ({ open, handleClose, preData }) => {
               <LocalizationProvider dateAdapter={AdapterMoment}>
                 <DatePicker
                   disableFuture
-                  label="Registration Date"
+                  label="Applied Date"
                   views={['year', 'month', 'day']}
                   inputFormat="DD/MM/YYYY"
                   value={date}
@@ -212,7 +210,7 @@ const UpdatePaperWork = ({ open, handleClose, preData }) => {
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Remind Before"
+                label="Remind Before in Days"
                 size="small"
                 type="number"
                 {...register('daysToRemind', {
@@ -224,7 +222,7 @@ const UpdatePaperWork = ({ open, handleClose, preData }) => {
               <TextField
                 fullWidth
                 required
-                label="Registration No"
+                label="Certificate No"
                 size="small"
                 {...register('certificateNo', {
                   required: true,
@@ -255,7 +253,18 @@ const UpdatePaperWork = ({ open, handleClose, preData }) => {
                 })}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Odometer"
+                size="small"
+                type="number"
+                {...register('odoMeter', {
+                  valueAsNumber: true,
+                })}
+              />
+            </Grid>
+            <Grid item xs={12} md={8}>
               <TextField
                 fullWidth
                 label="Remarks"

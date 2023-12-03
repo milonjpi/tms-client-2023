@@ -49,7 +49,7 @@ const UpdateExpense = ({ open, handleClose, preData }) => {
 
   // library
   const { data: vehicleData } = useVehiclesQuery(
-    { limit: 100, isActive: true },
+    { limit: 100, isActive: true, sortBy: 'vehicleId', sortOrder: 'asc' },
     { refetchOnMountOrArgChange: true }
   );
   const allVehicles = vehicleData?.vehicles || [];

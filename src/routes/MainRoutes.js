@@ -99,7 +99,22 @@ const ExpenseHeads = Loadable(
 const VehicleRegistration = Loadable(
   lazy(() => import('views/pages/PaperWork/VehicleRegistration'))
 );
+const TaxToken = Loadable(lazy(() => import('views/pages/PaperWork/TaxToken')));
+const Fitness = Loadable(lazy(() => import('views/pages/PaperWork/Fitness')));
+const RoutePermit = Loadable(
+  lazy(() => import('views/pages/PaperWork/RoutePermit'))
+);
 
+// Report
+const ReportSummary = Loadable(
+  lazy(() => import('views/pages/Report/ReportSummary'))
+);
+const FuelStatus = Loadable(
+  lazy(() => import('views/pages/Report/FuelStatus'))
+);
+const StockStatus = Loadable(
+  lazy(() => import('views/pages/Report/StockStatus'))
+);
 
 // utilities routing
 
@@ -460,6 +475,77 @@ const MainRoutes = {
                       allowedCodes={['registration']}
                     >
                       <VehicleRegistration />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'tax',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['tax']}
+                    >
+                      <TaxToken />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'fitness',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['fitness']}
+                    >
+                      <Fitness />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'route',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['route']}
+                    >
+                      <RoutePermit />
+                    </AuthenticationRoutes>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'report',
+              children: [
+                {
+                  path: 'summary',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['summary']}
+                    >
+                      <ReportSummary />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'fuel-status',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['fuel-status']}
+                    >
+                      <FuelStatus />
+                    </AuthenticationRoutes>
+                  ),
+                },
+                {
+                  path: 'stock-status',
+                  element: (
+                    <AuthenticationRoutes
+                      allowedRoles={['super_admin', 'admin']}
+                      allowedCodes={['stock-status']}
+                    >
+                      <StockStatus />
                     </AuthenticationRoutes>
                   ),
                 },

@@ -44,7 +44,7 @@ const AddPaperWork = ({ open, handleClose, paperType }) => {
 
   // library
   const { data: vehicleData } = useVehiclesQuery(
-    { limit: 100, isActive: true },
+    { limit: 100, isActive: true, sortBy: 'vehicleId', sortOrder: 'asc' },
     { refetchOnMountOrArgChange: true }
   );
   const allVehicles = vehicleData?.vehicles || [];
@@ -62,14 +62,12 @@ const AddPaperWork = ({ open, handleClose, paperType }) => {
       certificateNo: data?.certificateNo,
       effectiveDate,
       expiryDate,
-      daysToRemind:
-        expiryDate && data?.daysToRemind
-          ? expiryDate.subtract(data?.daysToRemind, 'days')
-          : null,
+      daysToRemind: data?.daysToRemind || 0,
       paperType: paperType,
       fee: data?.fee,
       otherAmount: data?.otherAmount || 0,
       totalAmount: data?.fee + (data?.otherAmount || 0),
+      odoMeter: data?.odoMeter || 0,
       remarks: data?.remarks,
     };
     try {
@@ -114,7 +112,7 @@ const AddPaperWork = ({ open, handleClose, paperType }) => {
           }}
         >
           <Typography sx={{ fontSize: 16, color: '#878781' }}>
-            New Registration
+            New Document
           </Typography>
           <IconButton
             color="error"
@@ -135,7 +133,7 @@ const AddPaperWork = ({ open, handleClose, paperType }) => {
               <LocalizationProvider dateAdapter={AdapterMoment}>
                 <DatePicker
                   disableFuture
-                  label="Registration Date"
+                  label="Applied Date"
                   views={['year', 'month', 'day']}
                   inputFormat="DD/MM/YYYY"
                   value={date}
@@ -214,7 +212,7 @@ const AddPaperWork = ({ open, handleClose, paperType }) => {
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Remind Before"
+                label="Remind Before in Days"
                 size="small"
                 type="number"
                 {...register('daysToRemind', {
@@ -226,7 +224,7 @@ const AddPaperWork = ({ open, handleClose, paperType }) => {
               <TextField
                 fullWidth
                 required
-                label="Registration No"
+                label="Certificate No"
                 size="small"
                 {...register('certificateNo', {
                   required: true,
@@ -257,7 +255,18 @@ const AddPaperWork = ({ open, handleClose, paperType }) => {
                 })}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Odometer"
+                size="small"
+                type="number"
+                {...register('odoMeter', {
+                  valueAsNumber: true,
+                })}
+              />
+            </Grid>
+            <Grid item xs={12} md={8}>
               <TextField
                 fullWidth
                 label="Remarks"
