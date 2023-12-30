@@ -201,7 +201,7 @@ const UpdateRepair = () => {
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
             <Typography sx={{ fontWeight: 700, pb: 2 }}>
-              Trip Details
+              Maintenance Details
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12}>
