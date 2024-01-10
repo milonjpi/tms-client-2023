@@ -28,7 +28,7 @@
 
 
 
-### Frontend Live Link: https://basic-inventory-demo.web.app
+### Frontend Live Link: https://truck-management-frontend.web.app
 
 ### Backend GitHub Link: https://github.com/milonjpi/tms-server-postgres
 
